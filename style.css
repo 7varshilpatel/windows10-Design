@@ -1,0 +1,203 @@
+:root {
+    --bg: #0b1220;
+    --panel: #0f1724;
+    --accent: #0078d4;
+    /* windows blue */
+    --muted: #9aa4b2;
+    --title-fg: #e6eef6;
+    --glass-bg: rgba(255, 255, 255, 0.04);
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --shadow: 0 8px 24px rgba(2, 6, 23, 0.6);
+    --radius: 10px;
+    --taskbar-height: 48px;
+    font-family: "Segoe UI", "Segoe UI Variable", system-ui, -apple-system, "Helvetica Neue", Arial;
+}
+
+* {
+    box-sizing: border-box
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    background: linear-gradient(180deg, #071021 0%, #081426 100%);
+    color: var(--title-fg);
+    -webkit-font-smoothing: antialiased
+}
+
+.app {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding-bottom: var(--taskbar-height);
+}
+
+/* Window (container) */
+.win {
+    width: 880px;
+    max-width: calc(100% - 40px);
+    margin: 48px auto;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+    border-radius: var(--radius);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    backdrop-filter: blur(8px) saturate(120%);
+    -webkit-backdrop-filter: blur(8px) saturate(120%);
+}
+
+/* Titlebar */
+.win .titlebar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    height: 40px;
+    cursor: default;
+    user-select: none;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.win .titlebar .icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, var(--accent), #005ea6);
+    display: inline-grid;
+    place-items: center;
+    font-weight: 700;
+    color: #fff;
+    font-size: 12px;
+}
+
+.win .titlebar .title {
+    flex: 1;
+    font-size: 13px;
+    color: var(--title-fg);
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.win .titlebar .controls {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.win .btn {
+    width: 36px;
+    height: 30px;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all .14s ease;
+    color: var(--muted);
+}
+
+.win .btn:hover {
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--title-fg);
+    transform: translateY(-1px)
+}
+
+.win .btn.close:hover {
+    background: #ff5c5c;
+    color: #fff;
+    transform: none
+}
+
+/* Content area */
+.win .content {
+    padding: 18px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Taskbar */
+.taskbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--taskbar-height);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 12px;
+    background: linear-gradient(180deg, rgba(5, 8, 12, 0.6), rgba(0, 0, 0, 0.5));
+    border-top: 1px solid rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(6px);
+}
+
+.taskbar .start {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.taskbar .start .dot {
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(135deg, var(--accent), #00a0ff);
+    border-radius: 4px;
+    display: inline-block
+}
+
+.taskbar .search {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.search input {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.015);
+    color: var(--title-fg);
+    outline: none;
+    transition: box-shadow .12s;
+}
+
+.search input:focus {
+    box-shadow: 0 4px 12px rgba(2, 6, 23, 0.6);
+    background: rgba(255, 255, 255, 0.03)
+}
+
+/* Subtle animations */
+.fade-in {
+    animation: fadeIn .26s ease both
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px)
+    }
+
+    to {
+        opacity: 1;
+        transform: none
+    }
+}
+
+/* Window resizing responsive */
+@media (max-width:900px) {
+    .win {
+        margin: 18px;
+        width: auto
+    }
+
+    .taskbar {
+        padding: 6px
+    }
+}

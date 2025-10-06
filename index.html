@@ -1,0 +1,342 @@
+<!-- index.html - Windows10-like desktop demo -->
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Windows10 - DesktopLook demo</title>
+    <style>
+        /* Basic resets + variables */
+        :root {
+            --bg-img: url('https://picsum.photos/1920/1080?blur=1');
+            /* replace with your wallpaper */
+            --accent: rgba(0, 120, 215, 0.85);
+            /* default blue accent */
+            --taskbar-height: 48px;
+            --taskbar-bg: rgba(18, 18, 18, 0.55);
+            --glass-opa: 0.55;
+            --glass-noise: linear-gradient(transparent 0%, rgba(255, 255, 255, 0.02) 100%);
+            --win-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+            --font-stack: "Segoe UI", Roboto, "Helvetica Neue", Arial, system-ui;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            font-family: var(--font-stack);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-image: var(--bg-img);
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            color: #eee;
+        }
+
+        /* Desktop icon grid */
+        .desktop {
+            flex: 1;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .icon {
+            width: 72px;
+            text-align: center;
+            font-size: 12px;
+            color: #f0f0f0;
+            margin: 6px;
+            user-select: none;
+            cursor: default;
+        }
+
+        .icon img {
+            width: 48px;
+            height: 48px;
+            display: block;
+            margin: 0 auto 6px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+        }
+
+        /* Taskbar */
+        .taskbar {
+            height: var(--taskbar-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8px;
+            box-sizing: border-box;
+            position: sticky;
+            bottom: 0;
+            backdrop-filter: blur(8px) saturate(1.05);
+            background: linear-gradient(180deg, rgba(30, 30, 30, 0.22), rgba(10, 10, 10, 0.35));
+            border-top: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .taskbar .left,
+        .taskbar .center,
+        .taskbar .right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .start-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            display: grid;
+            place-items: center;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: background .18s ease, transform .08s ease;
+        }
+
+        .start-btn:hover {
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateY(-1px);
+        }
+
+        .start-btn svg {
+            width: 18px;
+            height: 18px;
+            opacity: 0.95;
+            filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.5));
+        }
+
+        .tb-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: background .12s ease, transform .08s ease, box-shadow .12s ease;
+        }
+
+        .tb-icon:hover {
+            background: rgba(255, 255, 255, 0.03);
+            transform: translateY(-1px);
+        }
+
+        .tb-icon.active {
+            background: var(--accent);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+        }
+
+        /* System tray */
+        .tray {
+            color: #ddd;
+            font-size: 13px;
+            gap: 10px;
+            padding-right: 8px;
+        }
+
+        /* Sample window */
+        .window {
+            width: 720px;
+            max-width: calc(100% - 48px);
+            margin: 24px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+            border-radius: 4px;
+            box-shadow: var(--win-shadow);
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.35);
+        }
+
+        .titlebar {
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+            backdrop-filter: blur(6px);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .titlebar .title {
+            font-weight: 600;
+            font-size: 13px;
+            color: #f5f5f5;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .titlebar .controls {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .control-btn {
+            width: 36px;
+            height: 28px;
+            display: grid;
+            place-items: center;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.03)
+        }
+
+        .content {
+            padding: 16px;
+            color: #ddd;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.12);
+        }
+
+        /* Start menu (simple) */
+        .start-menu {
+            position: fixed;
+            left: 14px;
+            bottom: var(--taskbar-height);
+            transform: translateY(6px);
+            width: 340px;
+            max-width: 80vw;
+            background: rgba(18, 18, 18, 0.6);
+            backdrop-filter: blur(10px) saturate(1.1);
+            border-radius: 6px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 12px;
+            display: none;
+            /* toggle to show */
+        }
+
+        .start-menu .tiles {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .tile {
+            height: 48px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        /* accessibility focus */
+        [tabindex]:focus {
+            outline: 2px solid rgba(0, 120, 215, 0.45);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="desktop" id="desktop">
+        <!-- sample icons -->
+        <div class="icon" tabindex="0"><img src="https://img.icons8.com/fluency/48/windows-10.png" alt="Win">
+            <div>This PC</div>
+        </div>
+        <div class="icon" tabindex="0"><img src="https://img.icons8.com/fluency/48/folder-invoices.png" alt="Folder">
+            <div>Documents</div>
+        </div>
+        <div class="icon" tabindex="0"><img src="https://img.icons8.com/fluency/48/recycle-bin.png" alt="Bin">
+            <div>Recycle Bin</div>
+        </div>
+        <!-- open window -->
+        <div class="window" role="dialog" aria-label="Sample Window">
+            <div class="titlebar">
+                <div class="title"><img src="https://img.icons8.com/ios-filled/16/ffffff/camera.png" alt=""
+                        style="width:16px;height:16px;opacity:0.9"> Sample App</div>
+                <div class="controls">
+                    <div class="control-btn" title="Minimize">—</div>
+                    <div class="control-btn" title="Maximize">□</div>
+                    <div class="control-btn" title="Close">✕</div>
+                </div>
+            </div>
+            <div class="content">
+                <p>This is a sample content area. Replace with your own app contents and style to match Windows 10
+                    windows.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <div class="left">
+            <button class="start-btn" id="startBtn" aria-haspopup="true" aria-expanded="false" title="Start">
+                <!-- simple Windows glyph -->
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <rect x="2" y="4" width="8" height="7" fill="white" opacity="0.95" />
+                    <rect x="14" y="4" width="8" height="7" fill="white" opacity="0.9" />
+                    <rect x="2" y="13" width="8" height="7" fill="white" opacity="0.85" />
+                    <rect x="14" y="13" width="8" height="7" fill="white" opacity="0.75" />
+                </svg>
+            </button>
+            <div class="tb-icon active" title="Edge"><img src="https://img.icons8.com/ios-filled/20/ffffff/link.png"
+                    alt=""></div>
+            <div class="tb-icon" title="Explorer"><img
+                    src="https://img.icons8.com/ios-filled/20/ffffff/folder-invoices.png" alt=""></div>
+        </div>
+
+        <div class="center" aria-hidden="true">
+            <!-- centered app icons if you want -->
+        </div>
+
+        <div class="right tray">
+            <span id="clock"></span>
+        </div>
+    </div>
+
+    <!-- Start menu -->
+    <div class="start-menu" id="startMenu" role="menu" aria-hidden="true">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div style="font-weight:700">Pinned</div>
+            <div style="opacity:0.7;font-size:12px">All apps ▾</div>
+        </div>
+        <div class="tiles">
+            <div class="tile">Mail</div>
+            <div class="tile">Photos</div>
+            <div class="tile">Store</div>
+            <div class="tile">Settings</div>
+            <div class="tile">Calendar</div>
+            <div class="tile">Groove</div>
+            <div class="tile">Movies</div>
+            <div class="tile">Photos</div>
+        </div>
+    </div>
+
+    <script>
+        // small interactivity
+        const startBtn = document.getElementById('startBtn');
+        const startMenu = document.getElementById('startMenu');
+        const clock = document.getElementById('clock');
+
+        startBtn.addEventListener('click', (e) => {
+            const show = startMenu.style.display !== 'block';
+            startMenu.style.display = show ? 'block' : 'none';
+            startBtn.setAttribute('aria-expanded', String(show));
+            startMenu.setAttribute('aria-hidden', String(!show));
+        });
+
+        function updateClock() {
+            const d = new Date();
+            clock.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        updateClock(); setInterval(updateClock, 30000);
+    </script>
+</body>
+
+</html>
