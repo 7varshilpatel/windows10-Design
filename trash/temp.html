@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Personalize — Settings Mock (Windows-11 Style)</title>
+
+    <!-- Fonts (system-first stack for accuracy and performance) -->
+    <style>
+        /* Theme variables (root) */
+        :root {
+            --space-xxs: 6px;
+            --space-xs: 8px;
+            --space-sm: 12px;
+            --space-md: 18px;
+            --space-lg: 28px;
+            --space-xl: 40px;
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+
+            --bg: #f3f6f9;
+            --surface: #ffffff;
+            --muted: #6b7280;
+            --text-primary: #0f1724;
+            --accent: #1c64f2;
+            /* Windows-like blue accent */
+            --accent-weak: rgba(28, 100, 242, 0.08);
+            --border: #e6edf6;
+            --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+            --focus: 0 0 0 4px rgba(28, 100, 242, 0.12);
+            --glass: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.4));
+            --monitor-border: linear-gradient(180deg, #e9f2ff, #d9eaff);
+            --chev: rgba(15, 23, 42, 0.35);
+
+            --max-width: 1100px;
+            --monitor-w: 420px;
+            --monitor-h: 240px;
+        }
+
+        /* Dark theme overrides using prefers-color-scheme */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0b0f14;
+                --surface: #0f1720;
+                --muted: #9aa4b2;
+                --text-primary: #e6eef8;
+                --accent-weak: rgba(28, 100, 242, 0.12);
+                --border: rgba(255, 255, 255, 0.06);
+                --shadow: 0 10px 30px rgba(2, 6, 23, 0.7);
+                --glass: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+                --monitor-border: linear-gradient(180deg, #071228, #06121b);
+                --chev: rgba(255, 255, 255, 0.14);
+            }
+        }
+
+        /* App reset (avoid global element selectors — body uses a class) */
+        .app-body {
+            margin: 0;
+            background: var(--bg);
+            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, system-ui, -apple-system;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: var(--space-xl) var(--space-lg);
+        }
+
+        /* App container */
+        .app {
+            width: 100%;
+            max-width: var(--max-width);
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: var(--space-lg);
+            align-items: start;
+        }
+
+        /* Card base */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: var(--space-lg);
+        }
+
+        /* Top preview header (monitor + small control) */
+        .header-preview {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: var(--space-lg);
+            align-items: center;
+            padding: calc(var(--space-sm) * 0) var(--space-lg) var(--space-sm) var(--space-lg);
+            background: transparent;
+        }
+
+        .preview-frame {
+            width: var(--monitor-w);
+            height: var(--monitor-h);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            position: relative;
+            border: 10px solid transparent;
+            background-image: var(--monitor-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 30px rgba(2, 6, 23, 0.06);
+        }
+
+        .preview-screen {
+            width: calc(100% - 36px);
+            height: calc(100% - 38px);
+            border-radius: calc(var(--radius-md) - 4px);
+            overflow: hidden;
+            box-sizing: border-box;
+            background-color: #071428;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            display: block;
+        }
+
+        /* Small mock dialog overlay inside the monitor preview (top-right) */
+        .mock-dialog {
+            position: absolute;
+            right: 18px;
+            top: 20px;
+            width: 160px;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 6px 18px rgba(2, 6, 23, 0.08);
+            border: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .mock-dialog .mock-line {
+            height: 8px;
+            width: 76%;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #e6f0ff, #dbe9ff);
+        }
+
+        .mock-dialog .mock-btn {
+            height: 10px;
+            width: 36px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #1c64f2, #155bcc);
+            float: right;
+            margin-top: 6px;
+        }
+
+        /* Header control (right of monitor) */
+        .header-control {
+            margin-left: auto;
+            min-width: 160px;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+            align-items: flex-end;
+        }
+
+        .header-select {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            background: var(--surface);
+            border-radius: 999px;
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            box-shadow: none;
+            cursor: default;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .header-select .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        /* Personalize card (left main column) */
+        .personalize-card {
+            grid-column: 1 / 2;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        /* Recent images band */
+        .recent-block {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+            margin-top: var(--space-sm);
+        }
+
+        .recent-label {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .thumb-row {
+            display: flex;
+            gap: var(--space-xs);
+            align-items: center;
+            padding: var(--space-xs);
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.01), transparent);
+            border-radius: var(--radius-sm);
+        }
+
+        .thumb {
+            width: 88px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            flex: 0 0 auto;
+            position: relative;
+            border: 2px solid transparent;
+            box-shadow: 0 6px 18px rgba(2, 6, 23, 0.04);
+            transition: transform .16s ease, box-shadow .16s ease, border-color .12s ease;
+        }
+
+        .thumb:hover {
+            transform: translateY(-4px);
+        }
+
+        .thumb.selected {
+            border-color: var(--accent);
+            box-shadow: 0 8px 24px rgba(28, 100, 242, 0.12);
+        }
+
+        .thumb .thumb-cover {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Choose photo and fit rows */
+        .row {
+            display: flex;
+            gap: var(--space-lg);
+            align-items: center;
+            justify-content: space-between;
+            margin-top: var(--space-sm);
+        }
+
+        .label-left {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .muted-desc {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .browse-btn {
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            box-shadow: none;
+            cursor: pointer;
+            font-size: 13px;
+            transition: box-shadow .12s ease, transform .08s ease;
+        }
+
+        .browse-btn:hover {
+            transform: translateY(-2px)
+        }
+
+        .browse-btn:active {
+            transform: translateY(0)
+        }
+
+        .fit-select {
+            min-width: 180px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-xs);
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* Related settings (aside, right column) */
+        .related-panel {
+            grid-column: 2 / 3;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .related-title {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: var(--space-xs);
+        }
+
+        .related-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
+        }
+
+        .related-item:hover {
+            box-shadow: var(--shadow)
+        }
+
+        .related-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--accent-weak);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--accent);
+            flex: 0 0 44px;
+        }
+
+        .related-text {
+            flex: 1;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .related-sub {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .chev {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--chev);
+        }
+
+        /* Footer small note (optional) */
+        .small-note {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: var(--space-md);
+        }
+
+        /* Responsive */
+        @media (max-width: 980px) {
+            .app {
+                grid-template-columns: 1fr;
+                padding: 0;
+                gap: var(--space-md)
+            }
+
+            .header-control {
+                align-items: flex-start;
+                margin-left: 0;
+            }
+
+            .preview-frame {
+                margin: 0 auto;
+            }
+
+            .related-panel {
+                grid-column: 1 / -1;
+            }
+        }
+    </style>
+</head>
+
+<body class="app-body">
+    <main class="app" role="main" aria-labelledby="personalize-title">
+
+        <!-- Header preview (monitor + control) -->
+        <header class="header-preview" aria-hidden="false">
+            <figure class="card preview-frame" aria-hidden="true">
+                <div class="preview-screen preview-img-js" title="Live preview" role="img" aria-label="Desktop preview"
+                    style="background-image: url('/mnt/data/background-settings-windows-11 (Edited).jpg'); background-size: cover; background-position: center;">
+                    <!-- small mock dialog in preview to mimic screenshot -->
+                    <div class="mock-dialog" aria-hidden="true">
+                        <div class="mock-line" style="width:66%"></div>
+                        <div class="mock-line" style="width:48%"></div>
+                        <div class="mock-btn" style="width:48px; height:12px; border-radius:6px"></div>
+                    </div>
+                </div>
+            </figure>
+
+            <div class="header-control" aria-hidden="false">
+                <div class="header-select" aria-hidden="false" title="Background type">
+                    <span class="dot" aria-hidden="true"></span>
+                    <span style="font-weight:600;color:var(--text-primary);font-size:13px">Picture</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Left column: Personalize card -->
+        <section class="card personalize-card" aria-labelledby="personalize-title">
+            <div>
+                <h2 id="personalize-title" class="card-title">Personalize your background</h2>
+                <p class="card-desc">A picture background applies to your current desktop. Solid color or slideshow
+                    backgrounds apply to all your desktops.</p>
+            </div>
+
+            <!-- Recent images -->
+            <div class="recent-block" aria-labelledby="recent-label">
+                <div id="recent-label" class="recent-label">Recent images</div>
+
+                <div class="thumb-row" role="list" aria-label="Recent images">
+                    <!-- Thumbnails: data-img provides background used to update preview -->
+                    <button type="button" class="thumb thumb-js selected" data-img="gradient-blue" aria-pressed="true"
+                        title="Blue swirl">
+                        <span class="thumb-cover"
+                            style="background-image: linear-gradient( 135deg, #153975, #0b66ff );"></span>
+                    </button>
+
+                    <button type="button" class="thumb thumb-js" data-img="gray-fold" aria-pressed="false"
+                        title="Gray fold">
+                        <span class="thumb-cover"
+                            style="background-image: linear-gradient( 135deg, #d9dce1, #bfc4c9 );"></span>
+                    </button>
+
+                    <button type="button" class="thumb thumb-js" data-img="deep-blue" aria-pressed="false"
+                        title="Blue tile">
+                        <span class="thumb-cover"
+                            style="background-image: linear-gradient( 135deg, #0b44b5, #1e66f2 );"></span>
+                    </button>
+
+                    <button type="button" class="thumb thumb-js" data-img="purple-glow" aria-pressed="false"
+                        title="Purple glow">
+                        <span class="thumb-cover"
+                            style="background-image: linear-gradient( 135deg, #6b21a8, #8b5cf6 );"></span>
+                    </button>
+
+                    <button type="button" class="thumb thumb-js" data-img="sunset" aria-pressed="false" title="Magenta">
+                        <span class="thumb-cover"
+                            style="background-image: linear-gradient( 135deg, #2b1055, #a21caf );"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Choose a photo row -->
+            <div class="row" style="margin-top:var(--space-md)">
+                <div>
+                    <div class="label-left">Choose a photo</div>
+                    <div class="muted-desc">Browse photos on your device</div>
+                </div>
+
+                <div>
+                    <input type="file" accept="image/*" id="file-input-js" style="display:none" />
+                    <button type="button" class="browse-btn browse-btn-js" aria-controls="file-input-js"
+                        title="Browse photos">Browse photos</button>
+                </div>
+            </div>
+
+            <!-- Fit selection row -->
+            <div class="row">
+                <div>
+                    <div class="label-left">Choose a fit for your desktop image</div>
+                    <div class="muted-desc">How the image fits the screen</div>
+                </div>
+
+                <div>
+                    <div class="fit-select fit-select-js" role="listbox" aria-label="Image fit">
+                        <select class="fit-native-select-js" aria-label="Choose fit"
+                            style="background:transparent;border:0;font-size:13px;outline:none;cursor:pointer;">
+                            <option value="cover" selected>Fill</option>
+                            <option value="contain">Fit</option>
+                            <option value="stretch">Stretch</option>
+                            <option value="tile">Tile</option>
+                            <option value="center">Center</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right column: Related settings -->
+        <aside class="card related-panel" aria-labelledby="related-title">
+            <div id="related-title" class="related-title">Related settings</div>
+
+            <button class="related-item" type="button" title="Contrast themes">
+                <div class="related-icon" aria-hidden="true">A</div>
+                <div style="display:flex;flex-direction:column;align-items:flex-start;">
+                    <div class="related-text">Contrast themes</div>
+                    <div class="related-sub">Color themes for low vision, light sensitivity</div>
+                </div>
+                <div class="chev" aria-hidden="true">›</div>
+            </button>
+
+            <div class="small-note">This mock mirrors the Windows 11 Background settings layout closely — interactive
+                thumbnails update the preview above.</div>
+        </aside>
+
+    </main>
+
+    <!-- Behavior script (kept intentionally modular with clear -js class hooks) -->
+    <script>
+        (function () {
+            /* DOM hooks */
+            const previewEl = document.querySelector('.preview-img-js');
+            const thumbs = Array.from(document.querySelectorAll('.thumb-js'));
+            const fileInput = document.querySelector('#file-input-js');
+            const browseBtn = document.querySelector('.browse-btn-js');
+            const fitSelect = document.querySelector('.fit-native-select-js');
+
+            /* Thumb -> dataset image mapping (for demo, we use gradients; real app can store URLs) */
+            const thumbMap = {
+                'gradient-blue': 'linear-gradient(135deg, #153975 0%, #0b66ff 100%)',
+                'gray-fold': 'linear-gradient(135deg, #d9dce1 0%, #bfc4c9 100%)',
+                'deep-blue': 'linear-gradient(135deg, #0b44b5 0%, #1e66f2 100%)',
+                'purple-glow': 'linear-gradient(135deg, #6b21a8 0%, #8b5cf6 100%)',
+                'sunset': 'linear-gradient(135deg, #2b1055 0%, #a21caf 100%)'
+            };
+
+            /* Ensure one thumb is selected initially */
+            function selectThumb(el) {
+                thumbs.forEach(t => {
+                    t.classList.remove('selected');
+                    t.setAttribute('aria-pressed', 'false');
+                });
+                el.classList.add('selected');
+                el.setAttribute('aria-pressed', 'true');
+
+                const key = el.dataset.img;
+                const style = thumbMap[key] || thumbMap['gradient-blue'];
+                previewEl.style.backgroundImage = style;
+                // Reset background-size according to current fit selection
+                applyFit(fitSelect.value);
+            }
+
+            thumbs.forEach(t => {
+                t.addEventListener('click', function (e) {
+                    selectThumb(this);
+                });
+            });
+
+            /* Browse -> file input -> show chosen image as preview */
+            browseBtn.addEventListener('click', function () {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', function (e) {
+                const file = e.target.files && e.target.files[0];
+                if (!file) return;
+                const url = URL.createObjectURL(file);
+                previewEl.style.backgroundImage = `url('${url}')`;
+                previewEl.style.backgroundSize = (fitSelect.value === 'cover' ? 'cover' : fitSelect.value === 'contain' ? 'contain' : 'cover');
+                // remove thumb selection when user chooses file
+                thumbs.forEach(t => t.classList.remove('selected'));
+            });
+
+            /* Fit chooser mapping */
+            function applyFit(value) {
+                switch (value) {
+                    case 'cover': previewEl.style.backgroundSize = 'cover'; previewEl.style.backgroundRepeat = 'no-repeat'; previewEl.style.backgroundPosition = 'center'; break;
+                    case 'contain': previewEl.style.backgroundSize = 'contain'; previewEl.style.backgroundRepeat = 'no-repeat'; previewEl.style.backgroundPosition = 'center'; break;
+                    case 'stretch': previewEl.style.backgroundSize = '100% 100%'; previewEl.style.backgroundRepeat = 'no-repeat'; previewEl.style.backgroundPosition = 'center'; break;
+                    case 'tile': previewEl.style.backgroundSize = 'auto'; previewEl.style.backgroundRepeat = 'repeat'; previewEl.style.backgroundPosition = 'top left'; break;
+                    case 'center': previewEl.style.backgroundSize = 'auto'; previewEl.style.backgroundRepeat = 'no-repeat'; previewEl.style.backgroundPosition = 'center'; break;
+                    default: previewEl.style.backgroundSize = 'cover'; previewEl.style.backgroundRepeat = 'no-repeat'; previewEl.style.backgroundPosition = 'center';
+                }
+            }
+
+            fitSelect.addEventListener('change', function () {
+                applyFit(this.value);
+            });
+
+            /* keyboard accessibility: left/right arrow to navigate thumbs */
+            document.addEventListener('keydown', function (ev) {
+                const activeIndex = thumbs.findIndex(t => t.classList.contains('selected'));
+                if (ev.key === 'ArrowRight') {
+                    const next = (activeIndex + 1) % thumbs.length;
+                    selectThumb(thumbs[next]);
+                } else if (ev.key === 'ArrowLeft') {
+                    const prev = (activeIndex - 1 + thumbs.length) % thumbs.length;
+                    selectThumb(thumbs[prev]);
+                }
+            });
+
+            /* initial state */
+            (function init() {
+                const initiallySelected = thumbs.find(t => t.classList.contains('selected')) || thumbs[0];
+                selectThumb(initiallySelected);
+                applyFit(fitSelect.value);
+            }());
+        })();
+    </script>
+    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Incidunt asperiores maxime alias.
+</body>
+
+</html>

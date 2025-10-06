@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows 10 Inspired Navbar</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <!-- Taskbar / Navbar -->
+    <header class="taskbar">
+        <div class="taskbar-left">
+            <!-- Start Button -->
+            <button class="start-btn" aria-label="Start">
+                <span class="windows-logo"></span>
+            </button>
+
+            <!-- Search -->
+            <div class="search-box">
+                <input type="text" placeholder="Type here to search" aria-label="Search">
+            </div>
+        </div>
+
+        <div class="taskbar-right">
+            <!-- Action Center Button -->
+            <button class="action-center-btn" id="actionCenterToggle" aria-label="Action Center">
+                &#xE91C;
+            </button>
+        </div>
+    </header>
+
+    <!-- Action Center Panel -->
+    <aside class="action-center" id="actionCenter">
+        <div class="action-center-header">
+            <h2>Notifications</h2>
+            <button class="clear-all">Clear all</button>
+        </div>
+
+        <div class="notifications">
+            <!-- Example notification -->
+            <div class="notification">
+                <div class="notification-icon">📧</div>
+                <button class="dismiss-btn" aria-label="Dismiss">✕</button>
+                <div class="notification-content">
+                    <strong>Mail</strong>
+                    <p>You’ve got a new email from John.</p>
+                    <span class="time">5m ago</span>
+                </div>
+            </div>
+            <div class="notification">
+                <div class="notification-icon">🔔</div>
+                <button class="dismiss-btn" aria-label="Dismiss">✕</button>
+                <div class="notification-content">
+                    <strong>Reminder</strong>
+                    <p>Meeting at 3 PM.</p>
+                    <span class="time">15m ago</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <button class="quick-action">Wi-Fi</button>
+            <button class="quick-action">Bluetooth</button>
+            <button class="quick-action">Airplane Mode</button>
+            <button class="quick-action">Night Light</button>
+            <button class="quick-action">Battery Saver</button>
+            <button class="quick-action">Focus Assist</button>
+        </div>
+
+        <div class="brightness-control">
+            <label for="brightness">Brightness</label>
+            <input type="range" id="brightness" min="0" max="100" value="70">
+        </div>
+    </aside>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>

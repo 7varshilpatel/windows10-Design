@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalization Settings</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Segoe UI, sans-serif;
+            display: flex;
+            height: 100vh;
+            background: #f9f9f9;
+            color: #222;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: #fff;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .profile img {
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            margin-right: 10px;
+        }
+
+        .profile .info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile .info span:first-child {
+            font-weight: bold;
+        }
+
+        .search {
+            margin-bottom: 20px;
+        }
+
+        .search input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav a {
+            padding: 10px;
+            margin: 3px 0;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .nav a.active,
+        .nav a:hover {
+            background: #e5e5e5;
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            padding: 20px 30px;
+            overflow-y: auto;
+        }
+
+        .main h1 {
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .preview {
+            display: flex;
+            align-items: flex-start;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .preview-box {
+            width: 350px;
+            height: 200px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: url("https://picsum.photos/id/102/350/200") center/cover no-repeat;
+            position: relative;
+        }
+
+        .preview-box::after {
+            content: "";
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 80px;
+            height: 60px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .themes {
+            flex: 1;
+        }
+
+        .themes h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .theme-list {
+            display: flex;
+            gap: 12px;
+        }
+
+        .theme {
+            width: 80px;
+            height: 60px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .theme img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .theme.active {
+            border: 2px solid #0078d4;
+        }
+
+        /* Options List */
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            background: #fff;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .option:hover {
+            background: #f1f1f1;
+        }
+
+        .option strong {
+            display: block;
+            font-size: 15px;
+        }
+
+        .option span {
+            font-size: 13px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="profile">
+            <img src="https://i.pravatar.cc/48" alt="User">
+            <div class="info">
+                <span>Amanda Brady</span>
+                <span>amanda.brady@outlook.com</span>
+            </div>
+        </div>
+        <div class="search">
+            <input type="text" placeholder="Find a setting">
+        </div>
+        <div class="nav">
+            <a href="#">Home</a>
+            <a href="#">System</a>
+            <a href="#">Bluetooth & devices</a>
+            <a href="#">Network & internet</a>
+            <a href="#" class="active">Personalization</a>
+            <a href="#">Apps</a>
+            <a href="#">Accounts</a>
+            <a href="#">Time & language</a>
+            <a href="#">Gaming</a>
+            <a href="#">Accessibility</a>
+            <a href="#">Privacy & security</a>
+            <a href="#">Windows Update</a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+        <h1>Personalization</h1>
+        <div class="preview">
+            <div class="preview-box"></div>
+            <div class="themes">
+                <h3>Select a theme to apply</h3>
+                <div class="theme-list">
+                    <div class="theme active"><img src="https://picsum.photos/id/10/80/60"></div>
+                    <div class="theme"><img src="https://picsum.photos/id/20/80/60"></div>
+                    <div class="theme"><img src="https://picsum.photos/id/30/80/60"></div>
+                    <div class="theme"><img src="https://picsum.photos/id/40/80/60"></div>
+                    <div class="theme"><img src="https://picsum.photos/id/50/80/60"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="options">
+            <div class="option"><strong>Background</strong><span>Background image, color, slideshow</span></div>
+            <div class="option"><strong>Colors</strong><span>Accent color, transparency effects, color theme</span>
+            </div>
+            <div class="option"><strong>Themes</strong><span>Install, create, manage</span></div>
+            <div class="option"><strong>Lock screen</strong><span>Lock screen images, apps, animations</span></div>
+            <div class="option"><strong>Text input keyboard</strong><span>Touch keyboard, voice typing, emoji and more,
+                    input method editor</span></div>
+            <div class="option"><strong>Start</strong><span>Recent apps and items, folders</span></div>
+        </div>
+    </div>
+
+    <script>
+        // Simple JS to toggle theme selection
+        document.querySelectorAll('.theme').forEach(theme => {
+            theme.addEventListener('click', () => {
+                document.querySelectorAll('.theme').forEach(t => t.classList.remove('active'));
+                theme.classList.add('active');
+            });
+        });
+    </script>
+</body>
+
+</html>

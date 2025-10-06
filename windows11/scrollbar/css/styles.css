@@ -1,0 +1,83 @@
+:root {
+    --scrollbar-width: 6px;
+    --scrollbar-hover-width: 14px;
+    --scrollbar-bg: #e0e0e0;
+    --scrollbar-thumb: #888;
+    --scrollbar-thumb-hover: #555;
+    --scroll-btn-size: 24px;
+    --transition-speed: 0.25s;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.scroll-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.content {
+    flex: 1;
+    overflow-y: scroll;
+    padding: 1rem;
+    scrollbar-width: none;
+    /* Firefox hide */
+}
+
+.content::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari hide */
+}
+
+.scrollbar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: var(--scrollbar-width);
+    background: var(--scrollbar-bg);
+    transition: width var(--transition-speed) ease;
+    position: relative;
+}
+
+.scrollbar:hover {
+    width: var(--scrollbar-hover-width);
+}
+
+.scroll-track {
+    flex: 1;
+    width: 100%;
+    background: transparent;
+    position: relative;
+}
+
+.scroll-thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--scrollbar-thumb);
+    border-radius: 10px;
+    cursor: grab;
+    transition: background var(--transition-speed);
+}
+
+.scroll-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+}
+
+.scroll-btn {
+    width: 100%;
+    height: var(--scroll-btn-size);
+    border: none;
+    background: var(--scrollbar-thumb);
+    color: white;
+    cursor: pointer;
+    transition: background var(--transition-speed);
+}
+
+.scroll-btn:hover {
+    background: var(--scrollbar-thumb-hover);
+}

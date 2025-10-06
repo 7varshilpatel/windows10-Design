@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Windows 11 — Personalization › Background (Integrated)</title>
+    <style>
+        :root {
+            /* Main theme colors */
+            --bg: #f5f7fb;
+            --pane: #ffffff;
+            --text: #0f0f0f;
+            --muted: #5f6b7a;
+            --border-bottom: #005cb8;
+            --line: #e7ecf2;
+            --accent: #0a84ff;
+            --hover: rgba(0, 0, 0, .035);
+            
+            /* Border radius */
+            --radius-xl: 14px;
+            --radius-lg: 12px;
+            --radius-md: 10px;
+            --radius-sm: 4px;
+            --radius-xs: 2px;
+            
+            /* Shadows */
+            --shadow: 0 1px 0 rgba(0, 0, 0, .04), 0 10px 20px -15px rgba(16, 24, 40, .2);
+            
+            /* Icon sizes */
+            --xsm-icon: 12px;
+            --sm-icon: 14px;
+            --md-icon: 16px;
+            --lg-icon: 18px;
+
+            /* Collapsible container colors (dark theme) */
+            --collapse-bg: #2d2d30;
+            --collapse-border: #4a4a4d;
+            --collapse-header-bg: rgba(45, 45, 48, 0.9);
+            --collapse-header-bg-hover: rgba(55, 55, 58, 0.9);
+            --collapse-text: #ffffff;
+            --collapse-text-muted: #a0a0a0;
+            --collapse-icon-bg: #4a90e2;
+            --collapse-content-border: #4a4a4d;
+            
+            /* Thumbnail colors */
+            --thumb-border: #e5ebf2;
+            --thumb-active-border: #4a90e2;
+            --thumb-active-shadow: rgba(74, 144, 226, 0.5);
+            
+            /* Button colors */
+            --btn-bg: #404040;
+            --btn-border: #555555;
+            --btn-bg-hover: #4a4a4a;
+            --btn-border-hover: #666666;
+            
+            /* Custom select colors */
+            --select-bg: #4a4a4a;
+            --select-border: #6b7280;
+            --select-text: var(--pane);
+            --select-hover-bg: var(--muted);
+            --select-hover-border: #9ca3af;
+            --select-focus-border: #3b82f6;
+            --select-focus-shadow: rgba(59, 130, 246, 0.1);
+            --select-dropdown-bg: #4a4a4a;
+            --select-dropdown-border: #d1d5db;
+            --select-dropdown-shadow: rgba(0, 0, 0, 0.1);
+            --select-option-hover-bg: #f3f4f6;
+            --select-option-selected-bg: #eff6ff;
+            --select-option-selected-text: #1d4ed8;
+            --select-highlight-color: #0078d4;
+            
+            /* Transitions */
+            --transition-speed: 0.2s;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        /* App frame */
+        .app {
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 355px 1fr;
+            gap: 0;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            padding: 14px 10px 18px 10px;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px 10px 8px;
+            margin: 2px 6px 10px 6px;
+            border-radius: 12px;
+            transition: background var(--transition-speed) ease;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #9cc4ff, #5a8cff);
+            color: var(--pane);
+            font-weight: 700;
+            box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .45);
+        }
+
+        .profile .who {
+            line-height: 1.1
+        }
+
+        .profile .name {
+            font-weight: 600;
+            font-size: 14.5px
+        }
+
+        .profile .role {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .search-wrap {
+            padding: 0 12px 8px 12px;
+        }
+
+        .search {
+            position: relative;
+        }
+
+        .search input {
+            width: 100%;
+            height: 40px;
+            border-radius: 3px;
+            border: none;
+            border-bottom: 1px solid var(--muted);
+            outline: none;
+            padding: 0 40px 0 10px;
+            background: var(--pane);
+            font-size: 14px;
+            transition: box-shadow .15s ease, border-color .15s ease;
+        }
+
+        .search input:focus {
+            border-color: #c6d8ff;
+            border-bottom: 2px solid var(--border-bottom);
+        }
+
+        .search svg {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: var(--lg-icon);
+            height: var(--lg-icon);
+            opacity: .55
+        }
+
+        .nav {
+            padding: 6px 6px 6px 6px;
+            overflow: auto;
+        }
+
+        .nav-group {
+            margin-top: 4px
+        }
+
+        .nav-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px 10px 12px;
+            margin: 4px 4px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            user-select: none;
+            transition: background .18s ease;
+        }
+
+        .nav-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 13px;
+            bottom: 13px;
+            width: 3px;
+            border-radius: 3px;
+            background: transparent;
+            transition: background .18s ease, opacity .18s ease;
+            opacity: 0;
+        }
+
+        .nav-item:hover {
+            background: var(--hover);
+        }
+
+        .nav-item.active {
+            background: rgba(10, 132, 255, .08);
+        }
+
+        .nav-item.active::before {
+            background: var(--accent);
+            opacity: 1;
+        }
+
+        .nav-item .ico {
+            width: 22px;
+            height: 22px;
+            display: grid;
+            place-items: center;
+            opacity: .8;
+            flex: 0 0 auto;
+        }
+
+        .nav-item .label {
+            font-size: 14px;
+        }
+
+        /* Main area */
+        .main {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow: auto;
+        }
+
+        .main-inner {
+            padding: 18px 28px 28px 28px;
+            min-width: 860px;
+        }
+
+        .crumbs {
+            display: flex;
+            align-items: center;            
+            gap: 17px;
+            font-size: 31px;
+            font-weight: 600;
+            color: var(--muted);
+            margin-top: 30px;
+            margin-bottom: 25px;
+        }
+
+        .crumbs span:nth-last-child(1) {
+            color: var(--text);
+        }
+
+        .crumbs .sep {
+            width: var(--sm-icon);
+            opacity: .6
+        }
+
+        .screen {
+            height: 240px;
+            width: 340px;
+            margin-bottom: 10px;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            border: 1px solid var(--thumb-border);
+            background:
+                radial-gradient(110% 80% at 90% 10%, rgba(0, 0, 0, .10), transparent 40%),
+                radial-gradient(100% 100% at 0% 100%, rgba(0, 0, 0, .05), transparent 40%),
+                linear-gradient(135deg, #0f2d64 0%, #1048a9 32%, #2873f1 55%, #7aa2ff 85%);
+            aspect-ratio: 16/10;
+            position: relative;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .25);
+        }
+
+        .screen .mini-dialog {
+            position: absolute;
+            right: 16px;
+            top: 16px;
+            width: 160px;
+            background: var(--pane);
+            border: 1px solid #dfe6ef;
+            border-radius: var(--radius-md);
+            padding: 10px 10px 8px 10px;
+            box-shadow: 0 8px 24px rgba(16, 24, 40, .2);
+        }
+
+        .mini-btn {
+            content: "";
+            height: 15px;
+            width: 40px;
+            margin: 35px 0px 0px 90px;
+            border: none;
+            border-radius: 3px;
+            background-color: var(--accent);
+        }
+
+        .mini-line {
+            height: 5px;
+            border-radius: var(--radius-sm);
+            background: #eef2f7;
+            margin: 8px 0;
+        }
+
+        .mini-line.short {
+            width: 60%;
+        }
+
+        .mini-line.tiny {
+            width: 40%;
+        }
+
+        /* Collapsible Container Styles */
+        .collapsible-container {
+            width: 620px;
+            background: linear-gradient(135deg, #3a3a3d 0%, var(--collapse-bg) 100%);
+            border: 1px solid var(--collapse-border);
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .collapse-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: var(--collapse-header-bg);
+            border-bottom: 1px solid var(--collapse-border);
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .collapse-header:hover {
+            background: var(--collapse-header-bg-hover);
+        }
+
+        .collapse-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .collapse-icon {
+            width: var(--md-icon);
+            height: var(--md-icon);
+            background: var(--collapse-icon-bg);
+            border-radius: var(--radius-xs);
+            position: relative;
+        }
+
+        .collapse-icon::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(45deg, var(--collapse-icon-bg), #357abd);
+            border-radius: 1px;
+        }
+
+        .collapse-header-title {
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--collapse-text);
+        }
+
+        .collapse-header-subtitle {
+            font-size: 11px;
+            color: var(--collapse-text-muted);
+            margin-top: 1px;
+        }
+
+        .collapse-header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-text {
+            font-size: 12px;
+            color: var(--collapse-text);
+        }
+
+        .collapse-arrow {
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 4px solid var(--collapse-text);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .collapse-arrow.expanded {
+            transform: rotate(180deg);
+        }
+
+        .collapse-content {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: var(--collapse-bg);
+        }
+
+        .collapse-content.expanded {
+            max-height: 500px;
+        }
+
+        .collapse-content-row {
+            padding: 16px;
+            border-bottom: 1px solid var(--collapse-content-border);
+        }
+
+        .collapse-content-row:last-child {
+            border-bottom: none;
+        }
+
+        .collapse-section-label {
+            font-size: 11px;
+            color: var(--collapse-text-muted);
+            margin-bottom: 12px;
+            text-transform: none;
+        }
+
+        .collapse-thumbnails-grid {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .collapse-thumbnail {
+            width: 64px;
+            height: 36px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all var(--transition-speed) ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .collapse-thumbnail:hover {
+            border-color: var(--thumb-active-border);
+            transform: scale(1.05);
+        }
+
+        .collapse-thumbnail.active {
+            border-color: var(--thumb-active-border);
+            box-shadow: 0 0 8px var(--thumb-active-shadow);
+        }
+
+        .collapse-thumbnail.thumb1 {
+            background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 100%);
+        }
+
+        .collapse-thumbnail.thumb1::before {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: var(--md-icon);
+            height: var(--md-icon);
+            background: #1e3a8a;
+            border-radius: 1px;
+        }
+
+        .collapse-thumbnail.thumb2 {
+            background: linear-gradient(135deg, #87ceeb 0%, #4682b4 100%);
+        }
+
+        .collapse-thumbnail.thumb2::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: var(--radius-xs);
+        }
+
+        .collapse-thumbnail.thumb3 {
+            background: linear-gradient(135deg, #2d1b69 0%, #1a0f3a 100%);
+        }
+
+        .collapse-thumbnail.thumb3::before {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: 12px;
+            height: 12px;
+            background: #8b5cf6;
+            border-radius: 50%;
+        }
+
+        .collapse-thumbnail.thumb4 {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+        }
+
+        .collapse-thumbnail.thumb4::before {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            left: 6px;
+            width: 14px;
+            height: 8px;
+            background: #dc2626;
+            border-radius: var(--radius-xs);
+        }
+
+        .collapse-thumbnail.thumb5 {
+            background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+        }
+
+        .collapse-thumbnail.thumb5::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 12px;
+            height: 12px;
+            background: #60a5fa;
+            border-radius: 1px;
+        }
+
+        .collapse-thumbnail.thumb6 {
+            background: linear-gradient(135deg, #f8f8f8 0%, #eeeeee 100%);
+        }
+
+        .collapse-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .collapse-control-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .collapse-control-label {
+            font-size: 11px;
+            color: var(--collapse-text-muted);
+            white-space: nowrap;
+        }
+
+        .collapse-button {
+            background: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            color: var(--collapse-text);
+            padding: 4px 12px;
+            font-size: 11px;
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .collapse-button:hover {
+            background: var(--btn-bg-hover);
+            border-color: var(--btn-border-hover);
+        }
+
+        .collapse-row-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        /* Custom Select Styles */
+        .collapse-select-container {
+            position: relative;
+            width: 100px;
+        }
+
+        .collapse-select-box {
+            background: var(--select-bg);
+            border: 1px solid var(--select-border);
+            border-radius: 3px;
+            padding: 6px 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            transition: all var(--transition-speed) ease;
+            font-size: 11px;
+            color: var(--select-text);
+            min-width: 80px;
+        }
+
+        .collapse-select-box:hover {
+            color: var(--select-text);
+            background: var(--select-hover-bg);
+            border-color: var(--select-hover-border);
+        }
+
+        .collapse-select-box.open {
+            border-color: var(--select-focus-border);
+            box-shadow: 0 0 0 2px var(--select-focus-shadow);
+        }
+
+        .collapse-dropdown-arrow {
+            width: 12px;
+            height: 12px;
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .collapse-dropdown-arrow svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .collapse-select-box.open .collapse-dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .collapse-options {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            top: 0;
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
+        }
+
+        .collapse-options-inner {
+            background: var(--select-dropdown-bg);
+            border: 1px solid var(--select-dropdown-border);
+            border-radius: 3px;
+            box-shadow: 0 4px 12px var(--select-dropdown-shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .collapse-option {
+            padding: 0 12px;
+            height: 28px;
+            line-height: 28px;
+            cursor: pointer;
+            position: relative;
+            transition: all var(--transition-speed) ease;
+            font-size: 11px;
+            color: var(--select-text);
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .collapse-option:last-child {
+            border-bottom: none;
+        }
+
+        .collapse-option::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 2px;
+            height: calc(100% - 4px);
+            width: 3px;
+            background: transparent;
+            border-radius: var(--radius-xs);
+            transition: all var(--transition-speed) ease;
+        }
+
+        .collapse-option.selected::before {
+            background: var(--select-highlight-color);
+        }
+
+        .collapse-option.selected {
+            background: var(--select-option-selected-bg);
+            color: var(--select-option-selected-text);
+            font-weight: 500;
+        }
+
+        .collapse-option:hover {
+            background: var(--select-option-hover-bg);
+        }
+
+        .collapse-option.selected:hover {
+            background: var(--select-option-selected-bg);
+        }
+
+        .related {
+            margin-top: 18px;
+            background: var(--pane);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow);
+        }
+
+        .related .hd {
+            font-weight: 600;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .rel-item {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            border-top: 1px solid var(--line);
+        }
+
+        .rel-item:first-of-type {
+            border-top: 0
+        }
+
+        .rel-item .lbl {
+            font-size: 14px
+        }
+
+        .rel-item .desc {
+            font-size: 12.5px;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        .chev {
+            width: var(--lg-icon);
+            height: var(--lg-icon);
+            opacity: .5;
+            flex: 0 0 auto;
+        }
+
+        .wash {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+            background:
+                radial-gradient(1200px 400px at 40% -200px, rgba(10, 132, 255, .08), transparent 60%),
+                radial-gradient(900px 300px at 75% -160px, rgba(112, 171, 255, .10), transparent 60%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d6deea;
+            border-radius: 20px;
+            border: 3px solid transparent;
+            background-clip: content-box;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c4d2e6;
+            border: 3px solid transparent;
+            background-clip: content-box
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app" role="application" aria-label="Windows 11 Settings — Replica">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="profile" aria-label="Account">
+                <div class="avatar">ACK</div>
+                <div class="who">
+                    <div class="name">ACK</div>
+                    <div class="role">Local Account</div>
+                </div>
+            </div>
+
+            <div class="search-wrap">
+                <div class="search">
+                    <input type="search" placeholder="Find a setting" aria-label="Search settings" />
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12.7 12.7">
+                        <path fill="#000" fill-rule="evenodd"
+                            d="M8.025 0a4.675 4.675 0 0 0-4.674 4.675 4.675 4.675 0 0 0 .967 2.828L.206 11.614c-.262.262-.276.668-.032.912.244.244.65.23.912-.032l4.113-4.113a4.675 4.675 0 0 0 2.827.967A4.675 4.675 0 0 0 12.7 4.675 4.675 4.675 0 0 0 8.025 0Zm0 1.087a3.588 3.588 0 0 1 3.588 3.588 3.588 3.588 0 0 1-3.588 3.588 3.588 3.588 0 0 1-3.588-3.588A3.588 3.588 0 0 1 8.025 1.087Z" />
+                    </svg>
+                </div>
+            </div>
+
+            <nav class="nav" aria-label="Navigation">
+                <div class="nav-group">
+                    <div class="nav-item">
+                        <span class="ico">
+                            <svg viewBox="0 0 24 24" width="22" height="22">
+                                <rect x="3" y="4" width="18" height="12" rx="2" fill="currentColor" opacity=".18" />
+                                <rect x="5" y="6" width="14" height="8" rx="1.5" fill="currentColor" />
+                            </svg>
+                        </span>
+                        <span class="label">System</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="ico">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M8 6a4 4 0 1 1 8 0v12a4 4 0 1 1-8 0V6z" fill="currentColor" opacity=".9" />
+                            </svg>
+                        </span>
+                        <span class="label">Bluetooth &amp; devices</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="ico">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="8" fill="currentColor" opacity=".2" />
+                                <path d="M4 12h16M12 4v16" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </span>
+                        <span class="label">Network &amp; internet</span>
+                    </div>
+                    <div class="nav-item active">
+                        <span class="ico">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M5 5h14v8H5z" fill="currentColor" opacity=".2" />
+                                <circle cx="16.5" cy="16.5" r="3" fill="currentColor" />
+                                <rect x="6" y="6" width="6" height="6" rx="1.5" fill="currentColor" />
+                            </svg>
+                        </span>
+                        <span class="label">Personalization</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="ico">
+                            <svg viewBox="0 0 24 24">
+                                <rect x="4" y="6" width="16" height="12" rx="2" fill="currentColor" />
+                                <rect x="8" y="3" width="8" height="3" rx="1" fill="currentColor" opacity=".7" />
+                            </svg>
+                        </span>
+                        <span class="label">Apps</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="ico">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="12" cy="8" r="3.5" fill="currentColor" />
+                                <rect x="6" y="13" width="12" height="7" rx="3.5" fill="currentColor" opacity=".85" />
+                            </svg>
+                        </span>
+                        <span class="label">Accounts</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="ico">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none" />
+                                <path d="M12 7v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            </svg>
+                        </span>
+                        <span class="label">Time &amp; language</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="ico">
+                            <svg viewBox="0 0 24 24">
+                                <rect x="4" y="8" width="16" height="10" rx="2" fill="currentColor" />
+                                <path d="M7 8V6a5 5 0 0 1 10 0v2" stroke="currentColor" stroke-width="2" />
+                            </svg>
+                        </span>
+                        <span class="label">Gaming</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="ico">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 3l8 4v5c0 5-3.5 9.5-8 10-4.5-.5-8-5-8-10V7l8-4z" fill="currentColor" />
+                            </svg>
+                        </span>
+                        <span class="label">Accessibility</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="ico">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2l9 6-9 6-9-6 9-6zm0 14l9-6v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-8l9 6z"
+                                    fill="currentColor" />
+                            </svg>
+                        </span>
+                        <span class="label">Privacy &amp; security</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="ico">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 4a8 8 0 1 0 8 8" stroke="currentColor" stroke-width="2" fill="none" />
+                                <path d="M20 4v6h-6" stroke="currentColor" stroke-width="2" fill="none" />
+                            </svg>
+                        </span>
+                        <span class="label">Windows Update</span>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="main">
+            <div class="wash" aria-hidden="true"></div>
+            <div class="main-inner">
+                <div class="crumbs" aria-label="Breadcrumb">
+                    <span>Personalization</span>
+                    <svg class="sep" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12.7 12.7">
+                        <path
+                            d="M3.464 0c-.144 0-.288.052-.398.162a.56.56 0 0 0 .009.799l5.389 5.389-5.389 5.389a.565.565 0 0 0 .8.79l5.759-5.759a.56.56 0 0 0 0-.798L3.866.171A.56.56 0 0 0 3.464 0Z"
+                            fill="currentColor" stroke="currentColor" stroke-width="1" />
+                    </svg>
+                    <span>Background</span>
+                </div>
+
+                <div class="screen">
+                    <div class="mini-dialog" aria-hidden="true">
+                        <div class="mini-line"></div>
+                        <div class="mini-line"></div>
+                        <div class="mini-line short"></div>
+                        <button class="mini-btn"></button>
+                    </div>
+                </div>
+
+                <!-- Collapsible Container -->
+                <div class="collapsible-container">
+                    <div class="collapse-header" onclick="toggleCollapse()">
+                        <div class="collapse-header-left">
+                            <div class="collapse-icon"></div>
+                            <div>
+                                <div class="collapse-header-title">Personalize your background</div>
+                                <div class="collapse-header-subtitle">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Blandit auterum molestie eius.</div>
+                            </div>
+                        </div>
+                        <div class="collapse-header-right">
+                            <span class="theme-text">Windows (dark)</span>
+                            <div class="collapse-arrow" id="collapseArrow"></div>
+                        </div>
+                    </div>
+
+                    <div class="collapse-content" id="collapseContent">
+                        <!-- Row 1: Recent Images -->
+                        <div class="collapse-content-row">
+                            <div class="collapse-section-label">Recent images</div>
+                            <div class="collapse-thumbnails-grid">
+                                <div class="collapse-thumbnail thumb1 active" data-bg="t1"></div>
+                                <div class="collapse-thumbnail thumb2" data-bg="t2"></div>
+                                <div class="collapse-thumbnail thumb3" data-bg="t3"></div>
+                                <div class="collapse-thumbnail thumb4" data-bg="t4"></div>
+                                <div class="collapse-thumbnail thumb5" data-bg="t5"></div>
+                                <div class="collapse-thumbnail thumb6" data-bg="t6"></div>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Choose a Photo -->
+                        <div class="collapse-content-row">
+                            <div class="collapse-row-content">
+                                <span class="collapse-control-label">Choose a photo</span>
+                                <button class="collapse-button">Browse themes</button>
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Choose a Fit -->
+                        <div class="collapse-content-row">
+                            <div class="collapse-row-content">
+                                <span class="collapse-control-label">Choose a fit for your desktop image</span>
+                                <div class="collapse-select-container">
+                                    <div class="collapse-select-box">
+                                        Fill
+                                        <div class="collapse-dropdown-arrow">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12.7 12.7">
+                                                <path
+                                                    d="M0 3.464c0-.144.052-.288.162-.398a.56.56 0 0 1 .799.009l5.389 5.389 5.389-5.389a.565.565 0 0 1 .79.8l-5.759 5.759a.56.56 0 0 1-.798 0L0.171 3.866A.56.56 0 0 1 0 3.464Z"
+                                                    fill="currentColor" stroke="currentColor" stroke-width="1" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="collapse-options">
+                                        <div class="collapse-options-inner">
+                                            <div class="collapse-option selected">Fill</div>
+                                            <div class="collapse-option">Fit</div>
+                                            <div class="collapse-option">Stretch</div>
+                                            <div class="collapse-option">Tile</div>
+                                            <div class="collapse-option">Center</div>
+                                            <div class="collapse-option">Span</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hd">Related settings</div>
+                <section class="related" aria-label="Related settings">
+                    <div class="rel-item">
+                        <div>
+                            <div class="lbl">Contrast themes</div>
+                            <div class="desc">Color themes for low vision, light sensitivity</div>
+                        </div>
+                        <svg class="chev" viewBox="0 0 24 24">
+                            <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" />
+                        </svg>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Toggle collapse functionality
+        function toggleCollapse() {
+            const content = document.getElementById('collapseContent');
+            const arrow = document.getElementById('collapseArrow');
+
+            content.classList.toggle('expanded');
+            arrow.classList.toggle('expanded');
+        }
+
+        // Custom Select Class for Collapsible Container
+        class CollapseSelect {
+            constructor(container) {
+                this.container = container;
+                this.selectBox = container.querySelector('.collapse-select-box');
+                this.optionsContainer = container.querySelector('.collapse-options');
+                this.optionsInner = container.querySelector('.collapse-options-inner');
+                this.options = Array.from(this.optionsInner.children);
+                this.isOpen = false;
+                this.optionHeight = parseInt(getComputedStyle(this.options[0]).height);
+                this.bindEvents();
+            }
+
+            bindEvents() {
+                this.selectBox.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggleOptions();
+                });
+
+                this.options.forEach(option => {
+                    option.addEventListener('click', () => this.selectOption(option));
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!this.container.contains(e.target)) this.closeOptions();
+                });
+            }
+
+            toggleOptions() {
+                this.isOpen = !this.isOpen;
+                this.optionsContainer.style.display = 'flex';
+                this.selectBox.classList.toggle('open', this.isOpen);
+
+                if (this.isOpen) {
+                    this.selectBox.style.visibility = 'hidden';
+                    this.positionOptionsInner();
+                    this.optionsContainer.style.opacity = 0;
+                    requestAnimationFrame(() => this.optionsContainer.style.opacity = 1);
+                } else {
+                    this.closeOptions();
+                }
+            }
+
+            positionOptionsInner() {
+                const selectedIndex = this.options.findIndex(o => o.classList.contains('selected'));
+                const offset = -selectedIndex * this.optionHeight;
+                this.optionsInner.style.transform = `translateY(${offset}px)`;
+            }
+
+            selectOption(option) {
+                option.style.transform = 'translateX(5px)';
+                setTimeout(() => option.style.transform = 'translateX(0)', 150);
+
+                this.options.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                this.selectBox.firstChild.textContent = option.textContent;
+
+                this.closeOptions();
+            }
+
+            closeOptions() {
+                this.isOpen = false;
+                this.selectBox.style.visibility = 'visible';
+                this.selectBox.classList.remove('open');
+                this.optionsContainer.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Navigation functionality
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+
+            // Collapsible thumbnail functionality
+            const screen = document.querySelector('.screen');
+            const thumbnailGradients = {
+                t1: 'radial-gradient(120% 90% at 90% 10%, rgba(0,0,0,.10), transparent 40%), radial-gradient(100% 100% at 0% 100%, rgba(0,0,0,.05), transparent 40%), linear-gradient(135deg, #0f2d64 0%, #1048a9 32%, #2873f1 55%, #7aa2ff 85%)',
+                t2: 'radial-gradient(110% 70% at 10% 0%, rgba(0,0,0,.12), transparent 40%), radial-gradient(90% 70% at 100% 100%, rgba(0,0,0,.07), transparent 45%), linear-gradient(135deg,#0a2a5e 0%, #7f8ea7 60%, #d5ddea 100%)',
+                t3: 'radial-gradient(120% 80% at 90% 10%, rgba(0,0,0,.12), transparent 45%), linear-gradient(135deg,#0f0f0f 0%, #505050 60%, #9a9a9a 100%)',
+                t4: 'radial-gradient(120% 90% at 92% 8%, rgba(0,0,0,.16), transparent 45%), linear-gradient(135deg,#1a1048 0%, #5221a2 45%, #e0457b 100%)',
+                t5: 'radial-gradient(120% 90% at 90% 10%, rgba(0,0,0,.10), transparent 40%), linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 50%, #60a5fa 100%)',
+                t6: 'radial-gradient(110% 80% at 90% 10%, rgba(0,0,0,.08), transparent 40%), linear-gradient(135deg, #f8f8f8 0%, #eeeeee 50%, #d1d5db 100%)'
+            };
+
+            // Collapsible thumbnails click handler
+            document.querySelectorAll('.collapse-thumbnail').forEach(thumbnail => {
+                thumbnail.addEventListener('click', function () {
+                    document.querySelectorAll('.collapse-thumbnail').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const bgKey = this.dataset.bg;
+                    if (bgKey && thumbnailGradients[bgKey]) {
+                        screen.style.background = thumbnailGradients[bgKey];
+                    }
+                });
+            });
+
+            // Browse themes button
+            const browseBtn = document.querySelector('.collapse-button');
+            browseBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.click();
+            });
+
+            // Initialize custom select boxes
+            document.querySelectorAll('.collapse-select-container').forEach(container => new CollapseSelect(container));
+        });
+    </script>
+</body>
+
+</html>

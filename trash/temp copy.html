@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data:;" />
+    <title>Notification Center — Pixel-Exact UI</title>
+
+    <style>
+        /* =========================
+       THEME: VARIABLES
+       ========================= */
+        :root {
+            /* layout */
+            --container-w: 1595px;
+            --container-h: 897px;
+            --radius-s: 8px;
+            --radius-m: 12px;
+            --radius-l: 16px;
+            --radius-xl: 24px;
+            --gap-2: 8px;
+            --gap-3: 12px;
+            --gap-4: 16px;
+            --gap-6: 24px;
+            --gap-8: 32px;
+            --border-1: 1px;
+            --shadow-soft: 0 8px 24px rgba(0, 0, 0, .25);
+
+            /* palette — light defaults (overridden in dark below) */
+            --bg-0: #fafafa;
+            --bg-1: #ffffff;
+            --bg-2: #f4f4f5;
+            --bg-3: #efeff1;
+            --line-1: #e7e7ea;
+            --line-2: #e1e1e6;
+            --text-1: #0f0f14;
+            --text-2: #23262a;
+            --text-3: #6b6f76;
+
+            /* brand accents — kept same across schemes for identity */
+            --accent-1: #6E3CAF;
+            /* violet */
+            --accent-2: #4964F5;
+            /* blue */
+
+            /* UI tints (derived) */
+            --chip-bg: rgba(105, 121, 255, .08);
+            --chip-border: rgba(73, 100, 245, .35);
+            --chip-text: #2a3cff;
+
+            --muted-1: #bdbdbd;
+            --muted-2: #989898;
+
+            /* element specifics */
+            --card-bg: var(--bg-1);
+            --panel-bg: var(--bg-1);
+            --field-bg: var(--bg-2);
+            --hover-bg: #f1f1f4;
+            --active-bg: #e9e9ff;
+
+            /* scrollbars */
+            --sb-track: #e6e6ea;
+            --sb-thumb: #c9c9d2;
+            --sb-thumb-hover: #b2b2c0;
+
+            /* state */
+            --unread-dot: var(--accent-2);
+            --danger: #ff4d4f;
+            --success: #29c46d;
+            --warning: #ffb020;
+            --info: #5aa7ff;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                /* background layers from the vector palette */
+                --bg-0: #13162C;
+                /* canvas */
+                --bg-1: #1E1E1E;
+                /* base card */
+                --bg-2: #23262A;
+                /* sunken surfaces */
+                --bg-3: #29292A;
+                /* deep panels */
+                --line-1: #333333;
+                /* hairline */
+                --line-2: #3A3A3C;
+                /* mid line */
+                --text-1: #FFFEFE;
+                /* primary text */
+                --text-2: #BDBDBD;
+                /* secondary */
+                --text-3: #8C8C8C;
+                /* muted */
+
+                --chip-bg: rgba(110, 60, 175, .14);
+                --chip-border: rgba(110, 60, 175, .45);
+                --chip-text: #c6a8ff;
+
+                --card-bg: #1E1E1E;
+                --panel-bg: #1E1E1E;
+                --field-bg: #23262A;
+                --hover-bg: #29292A;
+                --active-bg: linear-gradient(90deg, rgba(110, 60, 175, .24), rgba(73, 100, 245, .24));
+
+                --sb-track: #23262A;
+                --sb-thumb: #3E344B;
+                --sb-thumb-hover: #5C4C70;
+
+                --unread-dot: var(--accent-2);
+            }
+        }
+
+        /* =========================
+       BASE + STRUCTURE (class-only styling)
+       ========================= */
+        .app {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            background: radial-gradient(1200px 600px at 15% 5%, rgba(110, 60, 175, .22), transparent 60%),
+                radial-gradient(1200px 700px at 85% 100%, rgba(73, 100, 245, .18), transparent 55%),
+                var(--bg-0);
+            color: var(--text-1);
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+
+        .shell {
+            width: var(--container-w);
+            height: var(--container-h);
+            background: linear-gradient(180deg, rgba(255, 255, 255, .02), rgba(255, 255, 255, .00)) padding-box, var(--bg-2);
+            border: var(--border-1) solid var(--line-1);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            display: grid;
+            grid-template-rows: 88px 1fr 56px;
+            grid-template-columns: 1fr;
+        }
+
+        /* =========================
+       HEADER
+       ========================= */
+        .header {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            align-items: center;
+            padding: 0 var(--gap-6);
+            background: var(--panel-bg);
+            border-bottom: var(--border-1) solid var(--line-2);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: var(--gap-4);
+        }
+
+        .brand-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            display: grid;
+            place-items: center;
+            box-shadow: 0 6px 24px rgba(73, 100, 245, .35), inset 0 0 0 1px rgba(255, 255, 255, .08);
+        }
+
+        .brand-title {
+            display: grid;
+            gap: 2px;
+        }
+
+        .brand-title .title {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: .2px;
+        }
+
+        .brand-title .subtitle {
+            font-size: 12px;
+            color: var(--text-3);
+        }
+
+        .header-tools {
+            display: flex;
+            align-items: center;
+            gap: var(--gap-4);
+            margin-right: var(--gap-6);
+        }
+
+        .field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 44px;
+            padding: 0 14px;
+            border-radius: var(--radius-l);
+            border: var(--border-1) solid var(--line-1);
+            background: var(--field-bg);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
+        }
+
+        .field-input {
+            border: 0;
+            outline: none;
+            background: transparent;
+            color: var(--text-1);
+            width: 320px;
+            font-size: 14px;
+        }
+
+        .field-input::placeholder {
+            color: var(--text-3);
+        }
+
+        .icon {
+            width: 18px;
+            height: 18px;
+            display: inline-grid;
+            place-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            height: 44px;
+            padding: 0 16px;
+            border-radius: var(--radius-l);
+            border: var(--border-1) solid var(--line-1);
+            background: var(--field-bg);
+            color: var(--text-1);
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: .15px;
+            transition: transform .06s ease, background .2s ease, border-color .2s ease;
+        }
+
+        .btn:hover {
+            background: var(--hover-bg);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn--primary {
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 8px 24px rgba(73, 100, 245, .35);
+        }
+
+        .btn--ghost {
+            background: transparent;
+            border-color: var(--line-1);
+        }
+
+        .btn-badge {
+            min-width: 22px;
+            height: 22px;
+            padding: 0 8px;
+            border-radius: 999px;
+            background: var(--chip-bg);
+            border: var(--border-1) solid var(--chip-border);
+            color: var(--chip-text);
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 22px;
+            display: inline-grid;
+            place-items: center;
+        }
+
+        /* =========================
+       MAIN GRID
+       ========================= */
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            /* feed | settings panel */
+            gap: var(--gap-6);
+            padding: var(--gap-6);
+            background: linear-gradient(180deg, rgba(255, 255, 255, .02), rgba(255, 255, 255, 0) 35%), var(--bg-2);
+        }
+
+        /* =========== FEED SIDE =========== */
+        .feed {
+            background: var(--card-bg);
+            border: var(--border-1) solid var(--line-1);
+            border-radius: var(--radius-xl);
+            display: grid;
+            grid-template-rows: auto 1fr;
+            overflow: hidden;
+        }
+
+        .feed-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--gap-4);
+            padding: 16px 16px 12px 16px;
+            border-bottom: var(--border-1) solid var(--line-1);
+            background: var(--panel-bg);
+        }
+
+        .tabs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px;
+            border-radius: 999px;
+            background: var(--bg-2);
+            border: var(--border-1) solid var(--line-1);
+        }
+
+        .tab {
+            height: 36px;
+            padding: 0 14px;
+            border-radius: 999px;
+            border: var(--border-1) solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-2);
+            cursor: pointer;
+            transition: background .2s ease, color .2s ease, border-color .2s ease;
+        }
+
+        .tab:hover {
+            background: var(--hover-bg);
+        }
+
+        .tab.is-active {
+            color: #fff;
+            background: var(--active-bg);
+            border-color: rgba(255, 255, 255, .08);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .06);
+        }
+
+        .feed-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notif-list {
+            position: relative;
+            overflow: auto;
+            padding: 8px;
+            height: calc(100% - 0px);
+            background:
+                linear-gradient(180deg, rgba(110, 60, 175, .08), transparent 28%),
+                linear-gradient(0deg, rgba(73, 100, 245, .06), transparent 40%),
+                var(--bg-2);
+        }
+
+        /* custom scrollbars - applied to list only */
+        .notif-list {
+            scrollbar-width: thin;
+            scrollbar-color: var(--sb-thumb) var(--sb-track);
+        }
+
+        .notif-list::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        .notif-list::-webkit-scrollbar-track {
+            background: var(--sb-track);
+            border-radius: 999px;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            background-clip: content-box;
+        }
+
+        .notif-list::-webkit-scrollbar-thumb {
+            background: var(--sb-thumb);
+            border-radius: 999px;
+            border: 3px solid transparent;
+            background-clip: content-box;
+        }
+
+        .notif-list::-webkit-scrollbar-thumb:hover {
+            background: var(--sb-thumb-hover);
+        }
+
+        .date-sep {
+            margin: 16px 8px 8px;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .date-sep .line {
+            height: 1px;
+            background: linear-gradient(90deg, rgba(255, 255, 255, .0), var(--line-2), rgba(255, 255, 255, .0));
+        }
+
+        .date-sep .label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-3);
+            letter-spacing: .3px;
+            padding: 4px 10px;
+            background: var(--bg-2);
+            border: var(--border-1) solid var(--line-1);
+            border-radius: 999px;
+        }
+
+        .notif {
+            position: relative;
+            display: grid;
+            grid-template-columns: 56px 1fr auto;
+            gap: 16px;
+            padding: 14px 16px;
+            margin: 8px 8px;
+            background: var(--card-bg);
+            border: var(--border-1) solid var(--line-1);
+            border-radius: var(--radius-l);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, .02);
+            transition: background .2s ease, border-color .2s ease, transform .05s ease;
+        }
+
+        .notif:hover {
+            background: var(--hover-bg);
+        }
+
+        .notif.is-unread {
+            border-color: rgba(73, 100, 245, .55);
+            background:
+                linear-gradient(90deg, rgba(73, 100, 245, .12), rgba(110, 60, 175, .12)) border-box;
+            box-shadow: 0 8px 26px rgba(73, 100, 245, .12);
+        }
+
+        .notif.is-unread::before {
+            content: "";
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: calc(100% - 16px);
+            border-radius: 4px;
+            background: linear-gradient(180deg, var(--accent-1), var(--accent-2));
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, .06) inset;
+        }
+
+        .avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(110, 60, 175, .2), rgba(73, 100, 245, .25));
+            display: grid;
+            place-items: center;
+            border: var(--border-1) solid var(--line-1);
+        }
+
+        .avatar-badge {
+            width: 16px;
+            height: 16px;
+            position: absolute;
+            transform: translate(24px, 24px);
+            border-radius: 999px;
+            background: var(--unread-dot);
+            border: 2px solid var(--card-bg);
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, .15);
+        }
+
+        .notif-body {
+            display: grid;
+            gap: 6px;
+        }
+
+        .notif-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            letter-spacing: .2px;
+        }
+
+        .pill {
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .3px;
+            border: var(--border-1) solid var(--line-1);
+            background: var(--bg-2);
+            color: var(--text-2);
+        }
+
+        .pill--sys {
+            color: var(--info);
+            border-color: rgba(90, 167, 255, .4);
+            background: rgba(90, 167, 255, .08);
+        }
+
+        .pill--warn {
+            color: var(--warning);
+            border-color: rgba(255, 176, 32, .4);
+            background: rgba(255, 176, 32, .08);
+        }
+
+        .pill--succ {
+            color: var(--success);
+            border-color: rgba(41, 196, 109, .4);
+            background: rgba(41, 196, 109, .08);
+        }
+
+        .notif-text {
+            color: var(--text-2);
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .notif-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-3);
+            font-size: 12px;
+        }
+
+        .notif-cta {
+            display: grid;
+            align-content: center;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            border: var(--border-1) solid var(--line-1);
+            background: var(--field-bg);
+            cursor: pointer;
+            transition: background .2s ease, transform .06s ease;
+        }
+
+        .btn-icon:hover {
+            background: var(--hover-bg);
+        }
+
+        .btn-icon:active {
+            transform: translateY(1px);
+        }
+
+        /* =========== SETTINGS SIDE =========== */
+        .settings {
+            background: var(--card-bg);
+            border: var(--border-1) solid var(--line-1);
+            border-radius: var(--radius-xl);
+            display: grid;
+            grid-template-rows: auto 1fr;
+            overflow: hidden;
+            transition: width .25s ease;
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: var(--border-1) solid var(--line-1);
+            background: var(--panel-bg);
+        }
+
+        .settings-title {
+            display: grid;
+            gap: 2px;
+        }
+
+        .settings-title .title {
+            font-weight: 800;
+            letter-spacing: .2px;
+        }
+
+        .settings-title .subtitle {
+            font-size: 12px;
+            color: var(--text-3);
+        }
+
+        .settings-body {
+            overflow: auto;
+            padding: 16px;
+            background: var(--bg-2);
+        }
+
+        .settings-body {
+            scrollbar-width: thin;
+            scrollbar-color: var(--sb-thumb) var(--sb-track);
+        }
+
+        .settings-body::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        .settings-body::-webkit-scrollbar-track {
+            background: var(--sb-track);
+            border-radius: 999px;
+        }
+
+        .settings-body::-webkit-scrollbar-thumb {
+            background: var(--sb-thumb);
+            border-radius: 999px;
+        }
+
+        .settings-body::-webkit-scrollbar-thumb:hover {
+            background: var(--sb-thumb-hover);
+        }
+
+        .group {
+            border: var(--border-1) solid var(--line-1);
+            background: var(--panel-bg);
+            border-radius: var(--radius-l);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .collapse {
+            /* container for each collapsible section */
+        }
+
+        .collapse-summary {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            font-weight: 700;
+            background: var(--panel-bg);
+            border-bottom: var(--border-1) solid var(--line-1);
+            cursor: pointer;
+        }
+
+        .collapse-summary .hint {
+            color: var(--text-3);
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .collapse-content {
+            padding: 14px 16px 16px;
+            display: grid;
+            gap: 12px;
+            background: var(--bg-2);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 16px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: var(--border-1) solid var(--line-1);
+            background: var(--card-bg);
+        }
+
+        .row .copy {
+            color: var(--text-2);
+        }
+
+        .row .desc {
+            color: var(--text-3);
+            font-size: 12px;
+        }
+
+        /* toggles */
+        .toggle {
+            --toggle-w: 48px;
+            --toggle-h: 28px;
+            position: relative;
+            width: var(--toggle-w);
+            height: var(--toggle-h);
+            border-radius: 999px;
+            background: var(--bg-3);
+            border: var(--border-1) solid var(--line-2);
+            display: grid;
+            align-items: center;
+            padding: 0 4px;
+            cursor: pointer;
+            transition: background .2s ease, border-color .2s ease;
+        }
+
+        .toggle[aria-checked="true"] {
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            border-color: transparent;
+            box-shadow: 0 8px 20px rgba(73, 100, 245, .25);
+        }
+
+        .toggle-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 999px;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, .25);
+            transform: translateX(0);
+            transition: transform .2s ease;
+        }
+
+        .toggle[aria-checked="true"] .toggle-thumb {
+            transform: translateX(20px);
+        }
+
+        /* radio chips */
+        .chipset {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chip {
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: var(--border-1) solid var(--line-1);
+            background: var(--field-bg);
+            font-weight: 700;
+            color: var(--text-2);
+            cursor: pointer;
+            transition: background .2s ease, border-color .2s ease, color .2s ease;
+        }
+
+        .chip.is-selected {
+            color: #fff;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            border-color: transparent;
+            box-shadow: 0 8px 20px rgba(73, 100, 245, .2);
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--line-1);
+            margin: 6px 0;
+        }
+
+        /* collapse settings panel wide/narrow */
+        .settings.is-collapsed {
+            width: 88px !important;
+        }
+
+        .settings.is-collapsed .settings-header .settings-title,
+        .settings.is-collapsed .collapse-content,
+        .settings.is-collapsed .collapse-summary .hint,
+        .settings.is-collapsed .row .copy,
+        .settings.is-collapsed .row .desc,
+        .settings.is-collapsed .btn .label {
+            display: none;
+        }
+
+        .settings.is-collapsed .collapse-summary {
+            grid-template-columns: 1fr;
+            justify-items: center;
+            padding: 14px 0;
+        }
+
+        .settings.is-collapsed .settings-body {
+            padding: 8px;
+        }
+
+        /* =========================
+       FOOTER
+       ========================= */
+        .footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--gap-6);
+            background: var(--panel-bg);
+            border-top: var(--border-1) solid var(--line-2);
+        }
+
+        .foot-left,
+        .foot-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .kbd {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 8px;
+            border: var(--border-1) solid var(--line-1);
+            background: var(--bg-2);
+            color: var(--text-2);
+            box-shadow: inset 0 1px rgba(255, 255, 255, .04);
+        }
+
+        /* utility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .spacer {
+            flex: 1;
+        }
+    </style>
+</head>
+
+<body class="app">
+    <div class="shell" role="application" aria-label="Notifications UI">
+
+        <!-- ================= HEADER ================= -->
+        <header class="header" role="banner">
+            <div class="brand">
+                <div class="brand-logo" aria-hidden="true">
+                    <!-- Bell/bolt hybrid to match vector vibe -->
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 2l2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4L7.4 16l.9-5L4.6 7.3l5-.7L12 2z" fill="white"
+                            opacity=".85" />
+                    </svg>
+                </div>
+                <div class="brand-title">
+                    <div class="title">Notifications</div>
+                    <div class="subtitle">Inbox · Mentions · System</div>
+                </div>
+            </div>
+
+            <div class="header-tools" role="search">
+                <label class="field" aria-label="Search notifications">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                            d="M10 18a8 8 0 1 1 5.293-2.707L20.586 20.586 19.172 22 14.707 17.535A8 8 0 0 1 10 18zm0-2a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"
+                            fill="currentColor" />
+                    </svg>
+                    <input class="field-input" type="search" placeholder="Search..." data-el="search-input" />
+                </label>
+            </div>
+
+            <div class="header-actions" role="toolbar" aria-label="Header actions">
+                <button class="btn btn--ghost" data-action="filter">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 5h16v2l-6 6v5l-4 2v-7L4 7z" fill="currentColor" />
+                    </svg>
+                    <span class="label">Filter</span>
+                </button>
+                <button class="btn btn--primary" data-action="mark-all-read">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M9 16.2l-3.5-3.5-1.4 1.4L9 19 20 8l-1.4-1.4z" fill="currentColor" />
+                    </svg>
+                    <span class="label">Mark all as read</span>
+                    <span class="btn-badge" data-el="unread-count">6</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- ================= MAIN ================= -->
+        <main class="main" role="main">
+            <!-- FEED -->
+            <section class="feed" aria-label="Notification feed">
+                <div class="feed-toolbar" role="tablist" aria-label="Feed tabs">
+                    <div class="tabs">
+                        <button class="tab is-active" role="tab" aria-selected="true" data-tab="all">
+                            <span>All</span>
+                            <span class="btn-badge" data-el="count-all">24</span>
+                        </button>
+                        <button class="tab" role="tab" aria-selected="false" data-tab="mentions">
+                            <span>Mentions</span>
+                            <span class="btn-badge" data-el="count-mentions">5</span>
+                        </button>
+                        <button class="tab" role="tab" aria-selected="false" data-tab="follows">
+                            <span>Follows</span>
+                            <span class="btn-badge" data-el="count-follows">8</span>
+                        </button>
+                        <button class="tab" role="tab" aria-selected="false" data-tab="system">
+                            <span>System</span>
+                            <span class="btn-badge" data-el="count-system">11</span>
+                        </button>
+                    </div>
+
+                    <div class="feed-actions">
+                        <button class="btn btn--ghost" data-action="sort">
+                            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M11 18H3v-2h8v2zm10-5H3v-2h18v2zM21 6H3V4h18v2z" fill="currentColor" />
+                            </svg>
+                            <span class="label">Sort</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="notif-list" data-el="notif-list" tabindex="0" aria-label="Scrollable notifications">
+                    <!-- date separator -->
+                    <div class="date-sep" aria-hidden="true">
+                        <div class="label">Today</div>
+                        <div class="line"></div>
+                    </div>
+
+                    <!-- sample notifications (pixel-consistent building blocks) -->
+                    <article class="notif is-unread" data-type="mention" data-id="n1">
+                        <div class="avatar" aria-hidden="true">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5z"
+                                    fill="currentColor" />
+                            </svg>
+                            <span class="avatar-badge" aria-hidden="true"></span>
+                        </div>
+                        <div class="notif-body">
+                            <div class="notif-title">
+                                <span>@alex mentioned you</span>
+                                <span class="pill">@project-alpha</span>
+                            </div>
+                            <div class="notif-text">
+                                “Can you review the latest commit and check the notification scroll behavior?”
+                            </div>
+                            <div class="notif-meta">
+                                <span>2m ago</span> • <span>Thread · UI</span>
+                            </div>
+                        </div>
+                        <div class="notif-cta">
+                            <button class="btn-icon" title="Mark as read" data-action="toggle-read">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M12 21l-8-9 2.5-2.5L12 15l9.5-9.5L24 8z" fill="currentColor" />
+                                </svg>
+                            </button>
+                            <button class="btn-icon" title="Open" data-action="open">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M14 3h7v7h-2V6.414l-9.293 9.293-1.414-1.414L17.586 5H14V3z"
+                                        fill="currentColor" />
+                                </svg>
+                            </button>
+                        </div>
+                    </article>
+
+                    <article class="notif is-unread" data-type="follow" data-id="n2">
+                        <div class="avatar" aria-hidden="true">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5z" fill="currentColor" />
+                            </svg>
+                            <span class="avatar-badge" aria-hidden="true"></span>
+                        </div>
+                        <div class="notif-body">
+                            <div class="notif-title">
+                                <span>New follower</span>
+                                <span class="pill">People</span>
+                            </div>
+                            <div class="notif-text">Riley started following you.</div>
+                            <div class="notif-meta">
+                                <span>14m ago</span> • <span>Profile</span>
+                            </div>
+                        </div>
+                        <div class="notif-cta">
+                            <button class="btn-icon" title="Mark as read" data-action="toggle-read">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M12 21l-8-9 2.5-2.5L12 15l9.5-9.5L24 8z" fill="currentColor" />
+                                </svg>
+                            </button>
+                            <button class="btn-icon" title="Follow back" data-action="open">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M12 5v6H6v2h6v6h2v-6h6v-2h-6V5z" fill="currentColor" />
+                                </svg>
+                            </button>
+                        </div>
+                    </article>
+
+                    <article class="notif" data-type="system" data-id="n3">
+                        <div class="avatar" aria-hidden="true">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M12 2l10 6v8l-10 6L2 16V8l10-6zm0 2.2L4 8v8l8 4.8 8-4.8V8l-8-3.8z"
+                                    fill="currentColor" />
+                            </svg>
+                        </div>
+                        <div class="notif-body">
+                            <div class="notif-title">
+                                <span>System maintenance</span>
+                                <span class="pill pill--sys">System</span>
+                            </div>
+                            <div class="notif-text">
+                                We’ll be performing upgrades at 02:00 UTC. Expect a brief reconnection window.
+                            </div>
+                            <div class="notif-meta">
+                                <span>1h ago</span> • <span>Status</span>
+                            </div>
+                        </div>
+                        <div class="notif-cta">
+                            <button class="btn-icon" title="Details" data-action="open">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2zm1 15h-2v-6h2zm0-8h-2V7h2z"
+                                        fill="currentColor" />
+                                </svg>
+                            </button>
+                        </div>
+                    </article>
+
+                    <article class="notif is-unread" data-type="warning" data-id="n4">
+                        <div class="avatar" aria-hidden="true">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M1 21h22L12 2 1 21zm12-3h-2v2h2zm0-8h-2v6h2z" fill="currentColor" />
+                            </svg>
+                            <span class="avatar-badge" aria-hidden="true" style="background: var(--warning)"></span>
+                        </div>
+                        <div class="notif-body">
+                            <div class="notif-title">
+                                <span>Password expires soon</span>
+                                <span class="pill pill--warn">Security</span>
+                            </div>
+                            <div class="notif-text">Your password will expire in 3 days. Update it to keep your account
+                                safe.</div>
+                            <div class="notif-meta">
+                                <span>2h ago</span> • <span>Account</span>
+                            </div>
+                        </div>
+                        <div class="notif-cta">
+                            <button class="btn-icon" title="Mark as read" data-action="toggle-read">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M12 21l-8-9 2.5-2.5L12 15l9.5-9.5L24 8z" fill="currentColor" />
+                                </svg>
+                            </button>
+                            <button class="btn-icon" title="Change password" data-action="open">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M21 10h-3V7a6 6 0 1 0-12 0v3H3v11h18V10zm-5 0H8V7a4 4 0 1 1 8 0v3z"
+                                        fill="currentColor" />
+                                </svg>
+                            </button>
+                        </div>
+                    </article>
+
+                    <!-- another separator -->
+                    <div class="date-sep" aria-hidden="true">
+                        <div class="label">Yesterday</div>
+                        <div class="line"></div>
+                    </div>
+
+                    <article class="notif" data-type="success" data-id="n5">
+                        <div class="avatar" aria-hidden="true">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2a10 10 0 1010 10A10.011 10.011 0 0012 2zm-1 15l-5-5 1.414-1.414L11 13.172l6.586-6.586L19 8z"
+                                    fill="currentColor" />
+                            </svg>
+                        </div>
+                        <div class="notif-body">
+                            <div class="notif-title">
+                                <span>Deployment succeeded</span>
+                                <span class="pill pill--succ">CI</span>
+                            </div>
+                            <div class="notif-text">Release v1.9.4 is live. All checks passed.</div>
+                            <div class="notif-meta">
+                                <span>1d ago</span> • <span>Pipeline</span>
+                            </div>
+                        </div>
+                        <div class="notif-cta">
+                            <button class="btn-icon" title="Open" data-action="open">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M14 3h7v7h-2V6.414l-9.293 9.293-1.414-1.414L17.586 5H14V3z"
+                                        fill="currentColor" />
+                                </svg>
+                            </button>
+                        </div>
+                    </article>
+
+                    <article class="notif" data-type="system" data-id="n6">
+                        <div class="avatar" aria-hidden="true">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M20 8H4l8-6 8 6zm0 2v8H4v-8h16z" fill="currentColor" />
+                            </svg>
+                        </div>
+                        <div class="notif-body">
+                            <div class="notif-title">
+                                <span>New device login</span>
+                                <span class="pill">Security</span>
+                            </div>
+                            <div class="notif-text">A login from Chrome on macOS was detected.</div>
+                            <div class="notif-meta">
+                                <span>1d ago</span> • <span>San Francisco</span>
+                            </div>
+                        </div>
+                        <div class="notif-cta">
+                            <button class="btn-icon" title="View details" data-action="open">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M12 7a5 5 0 1 0 5 5 5.006 5.006 0 0 0-5-5zm-1 8h2v2h-2z"
+                                        fill="currentColor" />
+                                </svg>
+                            </button>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- SETTINGS -->
+            <aside class="settings" aria-label="Notification settings" data-el="settings">
+                <div class="settings-header">
+                    <div class="settings-title">
+                        <div class="title">Settings</div>
+                        <div class="subtitle">Fine-tune notifications</div>
+                    </div>
+                    <button class="btn btn--ghost" title="Collapse settings" data-action="collapse-settings"
+                        aria-expanded="true">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M8 5l8 7-8 7V5z" fill="currentColor" />
+                        </svg>
+                        <span class="label">Collapse</span>
+                    </button>
+                </div>
+
+                <div class="settings-body">
+                    <!-- Delivery -->
+                    <section class="group collapse" data-el="collapse">
+                        <div class="collapse-summary" data-action="toggle-collapse">
+                            <div>
+                                Delivery
+                                <div class="hint">Where you want to be notified</div>
+                            </div>
+                            <div class="btn-icon" aria-hidden="true">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M12 15.5l-7-7 1.4-1.4L12 12.7l5.6-5.6L19 8.5z" fill="currentColor" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="collapse-content" role="region" aria-label="Delivery options">
+                            <div class="chipset" data-el="channel-chips">
+                                <button class="chip is-selected" data-chip="inbox">In-app</button>
+                                <button class="chip" data-chip="email">Email</button>
+                                <button class="chip" data-chip="sms">SMS</button>
+                                <button class="chip" data-chip="push">Push</button>
+                            </div>
+                            <div class="divider"></div>
+                            <div class="row">
+                                <div>
+                                    <div class="copy">Quiet hours</div>
+                                    <div class="desc">Silence alerts between 22:00–07:00</div>
+                                </div>
+                                <div class="toggle" role="switch" tabindex="0" aria-checked="false"
+                                    data-el="toggle-quiet">
+                                    <div class="toggle-thumb"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Types -->
+                    <section class="group collapse" data-el="collapse">
+                        <div class="collapse-summary" data-action="toggle-collapse">
+                            <div>
+                                Types
+                                <div class="hint">Choose what to receive</div>
+                            </div>
+                            <div class="btn-icon" aria-hidden="true">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M12 15.5l-7-7 1.4-1.4L12 12.7l5.6-5.6L19 8.5z" fill="currentColor" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="collapse-content" role="region" aria-label="Notification types">
+                            <div class="row">
+                                <div>
+                                    <div class="copy">Mentions</div>
+                                    <div class="desc">@you in comments & threads</div>
+                                </div>
+                                <div class="toggle" role="switch" tabindex="0" aria-checked="true"
+                                    data-el="toggle-mentions">
+                                    <div class="toggle-thumb"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div>
+                                    <div class="copy">Follows</div>
+                                    <div class="desc">When someone follows you</div>
+                                </div>
+                                <div class="toggle" role="switch" tabindex="0" aria-checked="true"
+                                    data-el="toggle-follows">
+                                    <div class="toggle-thumb"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div>
+                                    <div class="copy">System & Security</div>
+                                    <div class="desc">Outages, warnings & login alerts</div>
+                                </div>
+                                <div class="toggle" role="switch" tabindex="0" aria-checked="true"
+                                    data-el="toggle-system">
+                                    <div class="toggle-thumb"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Advanced -->
+                    <section class="group collapse" data-el="collapse">
+                        <div class="collapse-summary" data-action="toggle-collapse">
+                            <div>
+                                Advanced
+                                <div class="hint">Fine control</div>
+                            </div>
+                            <div class="btn-icon" aria-hidden="true">
+                                <svg class="icon" viewBox="0 0 24 24">
+                                    <path d="M12 15.5l-7-7 1.4-1.4L12 12.7l5.6-5.6L19 8.5z" fill="currentColor" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="collapse-content" role="region" aria-label="Advanced settings">
+                            <div class="row">
+                                <div>
+                                    <div class="copy">Desktop badges</div>
+                                    <div class="desc">Show count on dock/taskbar</div>
+                                </div>
+                                <div class="toggle" role="switch" tabindex="0" aria-checked="false"
+                                    data-el="toggle-badges">
+                                    <div class="toggle-thumb"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div>
+                                    <div class="copy">Auto-archive read</div>
+                                    <div class="desc">Move read items after 7 days</div>
+                                </div>
+                                <div class="toggle" role="switch" tabindex="0" aria-checked="true"
+                                    data-el="toggle-archive">
+                                    <div class="toggle-thumb"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </aside>
+        </main>
+
+        <!-- ================= FOOTER ================= -->
+        <footer class="footer" role="contentinfo">
+            <div class="foot-left">
+                <span class="kbd">J/K</span><span>navigate</span>
+                <span class="kbd">M</span><span>toggle read</span>
+            </div>
+            <div class="foot-right">
+                <span>Custom scrollbar & settings collapse demo</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        "use strict";
+
+        // Namespace-safe module to keep globals clean
+        (function NotificationsUI() {
+            const qs = (sel, ctx = document) => ctx.querySelector(sel);
+            const qsa = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+
+            const els = {
+                tabs: qsa('.tab'),
+                list: qs('[data-el="notif-list"]'),
+                unreadCount: qs('[data-el="unread-count"]'),
+                settings: qs('[data-el="settings"]'),
+                collapseBtns: qsa('[data-action="toggle-collapse"]'),
+                chips: qsa('[data-el="channel-chips"] .chip'),
+                toggles: qsa('.toggle[role="switch"]'),
+                search: qs('[data-el="search-input"]'),
+                markAll: qs('[data-action="mark-all-read"]'),
+                collapseSettingsBtn: qs('[data-action="collapse-settings"]')
+            };
+
+            // ---- Helper state + functions
+            const state = {
+                filter: 'all',
+                unreadSet: new Set(qsa('.notif.is-unread').map(n => n.dataset.id))
+            };
+
+            function updateUnreadBadge() {
+                els.unreadCount.textContent = state.unreadSet.size;
+            }
+
+            function setTab(next) {
+                state.filter = next;
+                els.tabs.forEach(t => {
+                    const isActive = t.dataset.tab === next;
+                    t.classList.toggle('is-active', isActive);
+                    t.setAttribute('aria-selected', String(isActive));
+                });
+
+                qsa('.notif').forEach(n => {
+                    const type = n.dataset.type;
+                    const visible = next === 'all' ? true : (type === next);
+                    n.style.display = visible ? 'grid' : 'none';
+                });
+            }
+
+            function toggleRead(notifEl) {
+                if (!notifEl) return;
+                const id = notifEl.dataset.id;
+                const isUnread = notifEl.classList.toggle('is-unread');
+                if (isUnread) state.unreadSet.add(id);
+                else state.unreadSet.delete(id);
+                updateUnreadBadge();
+            }
+
+            function markAllRead() {
+                qsa('.notif.is-unread').forEach(n => n.classList.remove('is-unread'));
+                state.unreadSet.clear();
+                updateUnreadBadge();
+            }
+
+            function filterBySearch(term) {
+                const t = term.trim().toLowerCase();
+                qsa('.notif').forEach(n => {
+                    const text = n.innerText.toLowerCase();
+                    n.style.display = text.includes(t) ? 'grid' : 'none';
+                });
+            }
+
+            function toggleSwitch(el) {
+                const current = el.getAttribute('aria-checked') === 'true';
+                el.setAttribute('aria-checked', String(!current));
+            }
+
+            function collapseSection(summaryEl) {
+                const container = summaryEl.closest('[data-el="collapse"]');
+                if (!container) return;
+                const content = container.querySelector('.collapse-content');
+                const expanded = content.style.display !== 'none';
+                content.style.display = expanded ? 'none' : 'grid';
+            }
+
+            function collapseSettingsPanel() {
+                const isCollapsed = els.settings.classList.toggle('is-collapsed');
+                els.collapseSettingsBtn.setAttribute('aria-expanded', String(!isCollapsed));
+            }
+
+            // ---- Wire events
+
+            // Tabs
+            els.tabs.forEach(t => {
+                t.addEventListener('click', () => setTab(t.dataset.tab));
+                t.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setTab(t.dataset.tab); }
+                });
+            });
+
+            // Search
+            let searchDebounce = 0;
+            els.search.addEventListener('input', (e) => {
+                clearTimeout(searchDebounce);
+                searchDebounce = setTimeout(() => filterBySearch(e.target.value), 150);
+            });
+
+            // Mark all read
+            els.markAll.addEventListener('click', markAllRead);
+
+            // Toggle read buttons
+            qsa('[data-action="toggle-read"]').forEach(btn => {
+                btn.addEventListener('click', () => toggleRead(btn.closest('.notif')));
+            });
+
+            // Open placeholder
+            qsa('[data-action="open"]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // simple pulse to indicate action
+                    const card = btn.closest('.notif');
+                    card.style.transform = 'scale(0.995)';
+                    setTimeout(() => { card.style.transform = ''; }, 120);
+                });
+            });
+
+            // Collapsible sections (arrow-row)
+            els.collapseBtns.forEach(s => {
+                s.addEventListener('click', () => collapseSection(s));
+            });
+
+            // Default collapsed state for demo parity (keeps "Delivery" open, others open)
+            qsa('[data-el="collapse"] .collapse-content').forEach(c => c.style.display = 'grid');
+
+            // Channel chips (radio-like)
+            els.chips.forEach(chip => {
+                chip.addEventListener('click', () => {
+                    els.chips.forEach(c => c.classList.toggle('is-selected', c === chip));
+                });
+            });
+
+            // Switches: click + space/enter
+            els.toggles.forEach(tg => {
+                tg.addEventListener('click', () => toggleSwitch(tg));
+                tg.addEventListener('keydown', (e) => {
+                    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggleSwitch(tg); }
+                });
+            });
+
+            // Collapse settings panel (icon mode)
+            els.collapseSettingsBtn.addEventListener('click', collapseSettingsPanel);
+
+            // Keyboard helpers
+            document.addEventListener('keydown', (e) => {
+                // J/K navigate
+                const items = qsa('.notif').filter(n => n.style.display !== 'none');
+                if (!items.length) return;
+                const activeIndex = items.findIndex(n => n.matches(':focus-within'));
+                if (e.key.toLowerCase() === 'j') {
+                    const next = items[Math.min(items.length - 1, activeIndex + 1)];
+                    (next || items[0]).querySelector('.btn-icon')?.focus();
+                }
+                if (e.key.toLowerCase() === 'k') {
+                    const prev = items[Math.max(0, activeIndex - 1)];
+                    (prev || items[items.length - 1]).querySelector('.btn-icon')?.focus();
+                }
+                if (e.key.toLowerCase() === 'm') {
+                    const card = items[Math.max(0, activeIndex)];
+                    if (card) toggleRead(card);
+                }
+            });
+
+            // Initialize
+            setTab('all');
+            updateUnreadBadge();
+        })();
+    </script>
+</body>
+
+</html>

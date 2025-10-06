@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Personalization Interface</title>
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --bg-muted: #e1e6f9;
+            --pane: #ffffff;
+            --text: #0f0f0f;
+            --muted: #5f6b7a;
+            --border-bottom: #005cb8;
+            --line: #e7ecf2;
+            --accent: #0a84ff;
+            --hover: rgba(0, 0, 0, .035);
+            --radius-xl: 10px;
+            --radius-lg: 8px;
+            --radius-md: 6px;
+            --radius-sm: 4px;
+            --radius-xs: 2px;
+            --shadow: 0 1px 0 rgba(0, 0, 0, .04), 0 10px 20px -15px rgba(16, 24, 40, .2);
+            --xsm-icon: 12px;
+            --sm-icon: 14px;
+            --md-icon: 16px;
+            --lg-icon: 18px;
+
+            --select-width: 100px;
+            --option-height: 28px;
+            --highlight-color: #0078d4;
+            --select-bg-color: #4a4a4a;
+            --select-bg-hover: var(--muted);
+            --select-shadow: rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.2s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #2d2d30;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 620px;
+            height: auto;
+            background: linear-gradient(135deg, #3a3a3d 0%, #2d2d30 100%);
+            border: 1px solid #4a4a4d;
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(45, 45, 48, 0.9);
+            border-bottom: 1px solid #4a4a4d;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .header:hover {
+            background: rgba(55, 55, 58, 0.9);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icon {
+            width: 16px;
+            height: 16px;
+            background: #4a90e2;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .icon::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(45deg, #4a90e2, #357abd);
+            border-radius: 1px;
+        }
+
+        .header-title {
+            font-size: 13px;
+            font-weight: 400;
+            color: #ffffff;
+        }
+
+        .header-subtitle {
+            font-size: 11px;
+            color: #a0a0a0;
+            margin-top: 1px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-text {
+            font-size: 12px;
+            color: #ffffff;
+        }
+
+        .collapse-arrow {
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 4px solid #ffffff;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .collapse-arrow.expanded {
+            transform: rotate(180deg);
+        }
+
+        .content {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .content.expanded {
+            max-height: 500px;
+        }
+
+        .content-row {
+            padding: 16px;
+            border-bottom: 1px solid #4a4a4d;
+        }
+
+        .content-row:last-child {
+            border-bottom: none;
+        }
+
+        .section-label {
+            font-size: 11px;
+            color: #a0a0a0;
+            margin-bottom: 12px;
+            text-transform: none;
+        }
+
+        .thumbnails-grid {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .thumbnail {
+            width: 64px;
+            height: 36px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .thumbnail:hover {
+            border-color: #4a90e2;
+            transform: scale(1.05);
+        }
+
+        .thumbnail.active {
+            border-color: #4a90e2;
+            box-shadow: 0 0 8px rgba(74, 144, 226, 0.5);
+        }
+
+        .thumb1 {
+            background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 100%);
+        }
+
+        .thumb1::before {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 16px;
+            height: 16px;
+            background: #1e3a8a;
+            border-radius: 1px;
+        }
+
+        .thumb2 {
+            background: linear-gradient(135deg, #87ceeb 0%, #4682b4 100%);
+        }
+
+        .thumb2::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 2px;
+        }
+
+        .thumb3 {
+            background: linear-gradient(135deg, #2d1b69 0%, #1a0f3a 100%);
+        }
+
+        .thumb3::before {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: 12px;
+            height: 12px;
+            background: #8b5cf6;
+            border-radius: 50%;
+        }
+
+        .thumb4 {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+        }
+
+        .thumb4::before {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            left: 6px;
+            width: 14px;
+            height: 8px;
+            background: #dc2626;
+            border-radius: 2px;
+        }
+
+        .thumb5 {
+            background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+        }
+
+        .thumb5::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 12px;
+            height: 12px;
+            background: #60a5fa;
+            border-radius: 1px;
+        }
+
+        .thumb6 {
+            background: linear-gradient(135deg, #f8f8f8 0%, #eeeeee 100%);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .control-label {
+            font-size: 11px;
+            color: #a0a0a0;
+            white-space: nowrap;
+        }
+
+        .button {
+            background: #404040;
+            border: 1px solid #555555;
+            color: #ffffff;
+            padding: 4px 12px;
+            font-size: 11px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .button:hover {
+            background: #4a4a4a;
+            border-color: #666666;
+        }
+
+        .row-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        /* Windows 11 Style Select Box */
+        .select-container {
+            position: relative;
+            width: var(--select-width);
+        }
+
+        .select-box {
+            background: var(--select-bg-color);
+            border: 1px solid var(--select-border);
+            border-radius: 3px;
+            padding: 6px 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            transition: all var(--transition-speed) ease;
+            font-size: 11px;
+            color: var(--bg);
+            min-width: 80px;
+        }
+
+        .select-box:hover {
+            color: var(--bg);
+            background: var(--select-bg-hover);
+            border-color: #9ca3af;
+        }
+
+        .select-box.open {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        .dropdown-arrow {
+            width: 12px;
+            height: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .dropdown-arrow svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .select-box.open .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .options {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            top: 0;
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+            transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
+        }
+
+        .options-inner {
+            background: var(--select-bg-color);
+            border: 1px solid #d1d5db;
+            border-radius: 3px;
+            box-shadow: 0 4px 12px var(--select-shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .option {
+            padding: 0 12px;
+            height: var(--option-height);
+            line-height: var(--option-height);
+            cursor: pointer;
+            position: relative;
+            transition: all var(--transition-speed) ease;
+            font-size: 11px;
+            color: var(--bg);
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .option:last-child {
+            border-bottom: none;
+        }
+
+        .option::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 2px;
+            height: calc(100% - 4px);
+            width: 3px;
+            background: transparent;
+            border-radius: 2px;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .option.selected::before {
+            background: var(--highlight-color);
+        }
+
+        .option.selected {
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-weight: 500;
+        }
+
+        .option:hover {
+            background: #f3f4f6;
+        }
+
+        .option.selected:hover {
+            background: #eff6ff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header" onclick="toggleCollapse()">
+            <div class="header-left">
+                <div class="icon"></div>
+                <div>
+                    <div class="header-title">Personalize your background</div>
+                    <div class="header-subtitle">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Blandit
+                        auterum molestie eius.</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <span class="theme-text">Windows (dark)</span>
+                <div class="collapse-arrow" id="collapseArrow"></div>
+            </div>
+        </div>
+
+        <div class="content" id="content">
+            <!-- Row 1: Recent Images -->
+            <div class="content-row">
+                <div class="section-label">Recent images</div>
+                <div class="thumbnails-grid">
+                    <div class="thumbnail thumb1 active"></div>
+                    <div class="thumbnail thumb2"></div>
+                    <div class="thumbnail thumb3"></div>
+                    <div class="thumbnail thumb4"></div>
+                    <div class="thumbnail thumb5"></div>
+                    <div class="thumbnail thumb6"></div>
+                </div>
+            </div>
+
+            <!-- Row 2: Choose a Photo -->
+            <div class="content-row">
+                <div class="row-content">
+                    <span class="control-label">Choose a photo</span>
+                    <button class="button">Browse themes</button>
+                </div>
+            </div>
+
+            <!-- Row 3: Choose a Fit -->
+            <div class="content-row">
+                <div class="row-content">
+                    <span class="control-label">Choose a fit for your desktop image</span>
+                    <div class="select-container">
+                        <div class="select-box">
+                            Fill
+                            <div class="dropdown-arrow">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12.7 12.7">
+                                    <path
+                                        d="M0 3.464c0-.144.052-.288.162-.398a.56.56 0 0 1 .799.009l5.389 5.389 5.389-5.389a.565.565 0 0 1 .79.8l-5.759 5.759a.56.56 0 0 1-.798 0L0.171 3.866A.56.56 0 0 1 0 3.464Z"
+                                        fill="currentColor" stroke="currentColor" stroke-width="1" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="options">
+                            <div class="options-inner">
+                                <div class="option selected">Fill</div>
+                                <div class="option">Fit</div>
+                                <div class="option">Stretch</div>
+                                <div class="option">Tile</div>
+                                <div class="option">Center</div>
+                                <div class="option">Span</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+    <script>
+        function toggleCollapse() {
+            const content = document.getElementById('content');
+            const arrow = document.getElementById('collapseArrow');
+
+            content.classList.toggle('expanded');
+            arrow.classList.toggle('expanded');
+        }
+
+        // Windows 11 Select Box Class
+        class Win11Select {
+            constructor(container) {
+                this.container = container;
+                this.selectBox = container.querySelector('.select-box');
+                this.optionsContainer = container.querySelector('.options');
+                this.optionsInner = container.querySelector('.options-inner');
+                this.options = Array.from(this.optionsInner.children);
+                this.isOpen = false;
+                this.optionHeight = parseInt(getComputedStyle(this.options[0]).height);
+                this.bindEvents();
+            }
+
+            bindEvents() {
+                this.selectBox.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggleOptions();
+                });
+
+                this.options.forEach(option => {
+                    option.addEventListener('click', () => this.selectOption(option));
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!this.container.contains(e.target)) this.closeOptions();
+                });
+            }
+
+            toggleOptions() {
+                this.isOpen = !this.isOpen;
+                this.optionsContainer.style.display = 'flex';
+                this.selectBox.classList.toggle('open', this.isOpen);
+
+                if (this.isOpen) {
+                    this.selectBox.style.visibility = 'hidden';
+                    this.positionOptionsInner();
+                    this.optionsContainer.style.opacity = 0;
+                    requestAnimationFrame(() => this.optionsContainer.style.opacity = 1);
+                } else {
+                    this.closeOptions();
+                }
+            }
+
+            positionOptionsInner() {
+                const selectedIndex = this.options.findIndex(o => o.classList.contains('selected'));
+                const offset = -selectedIndex * this.optionHeight;
+                this.optionsInner.style.transform = `translateY(${offset}px)`;
+            }
+
+            selectOption(option) {
+                // Subtle transition effect
+                option.style.transform = 'translateX(5px)';
+                setTimeout(() => option.style.transform = 'translateX(0)', 150);
+
+                this.options.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                this.selectBox.firstChild.textContent = option.textContent;
+
+                this.closeOptions();
+            }
+
+            closeOptions() {
+                this.isOpen = false;
+                this.selectBox.style.visibility = 'visible';
+                this.selectBox.classList.remove('open');
+                this.optionsContainer.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const thumbnails = document.querySelectorAll('.thumbnail');
+
+            thumbnails.forEach(thumbnail => {
+                thumbnail.addEventListener('click', function () {
+                    thumbnails.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            const browseBtn = document.querySelector('.button');
+            browseBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.click();
+            });
+
+            // Initialize Windows 11 select boxes
+            document.querySelectorAll('.select-container').forEach(container => new Win11Select(container));
+        });
+    </script>
+</body>
+
+</html>

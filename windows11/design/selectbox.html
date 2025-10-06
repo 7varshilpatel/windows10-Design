@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows 11 Style Select Box</title>
+    <style>
+        :root {
+            --select-width: 200px;
+            --option-height: 36px;
+            --highlight-color: #0078d4;
+            --bg-color: #fff;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.2s;
+        }
+
+        body {
+            font-family: "Segoe UI Variable", "Segoe UI", sans-serif;
+            background: #f3f3f3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .select-container {
+            position: relative;
+            width: var(--select-width);
+        }
+
+        /* Collapsed select box */
+        .select-box {
+            background: var(--bg-color);
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .dropdown-arrow {
+            width: 12px;
+            height: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .options {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            top: 0;
+            display: none;
+            flex-direction: column;
+            z-index: 2;
+            transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
+        }
+
+        .options-inner {
+            background: var(--bg-color);
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .option {
+            padding: 0 12px;
+            height: var(--option-height);
+            line-height: var(--option-height);
+            cursor: pointer;
+            position: relative;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .option::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 4px;
+            height: calc(100% - 8px);
+            width: 3px;
+            background: transparent;
+            border-radius: 2px;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .option.selected::before {
+            background: var(--highlight-color);
+        }
+
+        .option:hover {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="select-container">
+        <div class="select-box">
+            Fit
+            <svg class="dropdown-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12.7 12.7">
+                <path
+                    d="M0 3.464c0-.144.052-.288.162-.398a.56.56 0 0 1 .799.009l5.389 5.389 5.389-5.389a.565.565 0 0 1 .79.8l-5.759 5.759a.56.56 0 0 1-.798 0L0.171 3.866A.56.56 0 0 1 0 3.464Z"
+                    fill="currentColor" stroke="currentColor" stroke-width="1" />
+            </svg>
+        </div>
+        <div class="options">
+            <div class="options-inner">
+                <div class="option selected">Fit</div>
+                <div class="option">Stretch</div>
+                <div class="option">Tile</div>
+                <div class="option">Center</div>
+                <div class="option">Span</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class Win11Select {
+            constructor(container) {
+                this.container = container;
+                this.selectBox = container.querySelector('.select-box');
+                this.optionsContainer = container.querySelector('.options');
+                this.optionsInner = container.querySelector('.options-inner');
+                this.options = Array.from(this.optionsInner.children);
+                this.isOpen = false;
+                this.optionHeight = parseInt(getComputedStyle(this.options[0]).height);
+                this.bindEvents();
+            }
+
+            bindEvents() {
+                this.selectBox.addEventListener('click', () => this.toggleOptions());
+
+                this.options.forEach(option => {
+                    option.addEventListener('click', () => this.selectOption(option));
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!this.container.contains(e.target)) this.closeOptions();
+                });
+            }
+
+            toggleOptions() {
+                this.isOpen = !this.isOpen;
+                this.optionsContainer.style.display = 'flex';
+                this.selectBox.classList.toggle('open', this.isOpen);
+
+                if (this.isOpen) {
+                    this.selectBox.style.visibility = 'hidden';
+                    this.positionOptionsInner();
+                    this.optionsContainer.style.opacity = 0;
+                    requestAnimationFrame(() => this.optionsContainer.style.opacity = 1);
+                } else {
+                    this.closeOptions();
+                }
+            }
+
+            positionOptionsInner() {
+                const selectedIndex = this.options.findIndex(o => o.classList.contains('selected'));
+                const offset = -selectedIndex * this.optionHeight; // Move inner wrapper so selected aligns with select box
+                this.optionsInner.style.transform = `translateY(${offset}px)`;
+            }
+
+            selectOption(option) {
+                // Subtle transition even if same option
+                option.style.transform = 'translateX(5px)';
+                setTimeout(() => option.style.transform = 'translateX(0)', 150);
+
+                this.options.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                this.selectBox.textContent = option.textContent;
+
+                this.closeOptions();
+            }
+
+            closeOptions() {
+                this.isOpen = false;
+                this.selectBox.style.visibility = 'visible';
+                this.selectBox.classList.remove('open');
+                this.optionsContainer.style.display = 'none';
+            }
+        }
+
+        // Reusable across multiple selects
+        document.querySelectorAll('.select-container').forEach(container => new Win11Select(container));
+    </script>
+
+</body>
+
+</html>

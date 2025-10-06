@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows System Interface</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="main-content" id="mainContent">
+        <!-- Main desktop content area -->
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Start Menu -->
+    <div class="start-menu" id="startMenu">
+        <nav class="start-menu-sidebar">
+            <header class="start-menu-header">
+                <button class="hamburger-menu">☰</button>
+            </header>
+
+            <section class="app-list">
+                <h2 class="section-title">Recently added</h2>
+                <button class="app-item">
+                    <div class="app-icon whatsapp">💬</div>
+                    <span>WhatsApp</span>
+                </button>
+
+                <h2 class="section-title">A</h2>
+                <button class="app-item">
+                    <div class="app-icon viewer-3d">📦</div>
+                    <span>3D Viewer</span>
+                </button>
+                <button class="app-item">
+                    <div class="app-icon access">🗃️</div>
+                    <span>Access</span>
+                </button>
+                <button class="app-item">
+                    <div class="app-icon adobe">📄</div>
+                    <span>Adobe Reader 9</span>
+                </button>
+                <button class="app-item">
+                    <div class="app-icon clock">⏰</div>
+                    <span>Alarms & Clock</span>
+                </button>
+
+                <h2 class="section-title">B</h2>
+                <button class="app-item">
+                    <div class="app-icon brave">🦁</div>
+                    <span>Brave</span>
+                </button>
+
+                <h2 class="section-title">C</h2>
+                <button class="app-item">
+                    <div class="app-icon calculator">🧮</div>
+                    <span>Calculator</span>
+                </button>
+                <button class="app-item">
+                    <div class="app-icon calendar">📅</div>
+                    <span>Calendar</span>
+                </button>
+                <button class="app-item">
+                    <div class="app-icon camera">📷</div>
+                    <span>Camera</span>
+                </button>
+                <button class="app-item">
+                    <div class="app-icon connect">🔗</div>
+                    <span>Connect</span>
+                </button>
+
+                <h2 class="section-title">E</h2>
+                <button class="app-item">
+                    <div class="app-icon excel">📊</div>
+                    <span>Excel</span>
+                </button>
+            </section>
+
+            <div class="start-bottom-nav">
+                <button class="nav-icon">📄</button>
+                <button class="nav-icon">🖼️</button>
+                <button class="nav-icon">⚙️</button>
+                <button class="nav-icon">⏻</button>
+            </div>
+        </nav>
+
+        <main class="start-menu-content">
+            <section class="content-section">
+                <h1 class="section-header">Productivity</h1>
+                <div class="tile-grid">
+                    <a href="#" class="tile tile-medium office">
+                        <div class="tile-icon">📄</div>
+                        <div class="tile-name">Office</div>
+                    </a>
+                    <a href="#" class="tile calculator">
+                        <div class="tile-icon">🧮</div>
+                        <div class="tile-name">Calculator</div>
+                    </a>
+                    <a href="#" class="tile excel">
+                        <div class="tile-icon">📊</div>
+                        <div class="tile-name">Excel</div>
+                    </a>
+                    <a href="#" class="tile calendar">
+                        <div class="tile-icon">📅</div>
+                        <div class="tile-name">Calendar</div>
+                    </a>
+                    <a href="#" class="tile edge">
+                        <div class="tile-icon">🌐</div>
+                        <div class="tile-name">Edge</div>
+                    </a>
+                    <a href="#" class="tile photos">
+                        <div class="tile-icon">🖼️</div>
+                        <div class="tile-name">Photos</div>
+                    </a>
+                    <a href="#" class="tile linkedin">
+                        <div class="tile-icon">💼</div>
+                        <div class="tile-name">LinkedIn</div>
+                    </a>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h1 class="section-header">Explore</h1>
+                <div class="tile-grid">
+                    <a href="#" class="tile store">
+                        <div class="tile-icon">🏪</div>
+                        <div class="tile-name">Store</div>
+                    </a>
+                    <a href="#" class="tile calculator">
+                        <div class="tile-icon">🧮</div>
+                        <div class="tile-name">Calculator</div>
+                    </a>
+                    <a href="#" class="tile todo">
+                        <div class="tile-icon">✓</div>
+                        <div class="tile-name">To Do</div>
+                    </a>
+                    <a href="#" class="tile movies">
+                        <div class="tile-icon">🎬</div>
+                        <div class="tile-name">Movies</div>
+                    </a>
+                    <a href="#" class="tile solitaire">
+                        <div class="tile-icon">🃏</div>
+                        <div class="tile-name">Solitaire</div>
+                    </a>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Notification Sidebar -->
+    <div class="notification-sidebar" id="notificationSidebar">
+        <div class="notification-header">
+            <div class="notification-title">Notifications</div>
+            <button class="close-button" id="closeButton"></button>
+        </div>
+
+        <div class="notifications-content">
+            <div class="notification-card">
+                <div class="notification-header-row">
+                    <div class="notification-app">
+                        <div class="app-icon"></div>
+                        <div class="app-name">Microsoft Teams</div>
+                    </div>
+                    <div class="notification-actions">
+                        <button class="action-button settings"></button>
+                        <button class="action-button close"></button>
+                    </div>
+                </div>
+                <div class="notification-title-text">New Meeting</div>
+                <div class="notification-content">Your team meeting starts in 10 minutes</div>
+                <div class="notification-time">9:45 AM</div>
+            </div>
+
+            <div class="notification-card">
+                <div class="notification-header-row">
+                    <div class="notification-app">
+                        <div class="app-icon"></div>
+                        <div class="app-name">Outlook</div>
+                    </div>
+                    <div class="notification-actions">
+                        <button class="action-button close"></button>
+                    </div>
+                </div>
+                <div class="notification-title-text">New Email</div>
+                <div class="notification-content">You have 3 new messages in your inbox</div>
+                <div class="notification-time">9:30 AM</div>
+            </div>
+
+            <div class="notification-card">
+                <div class="notification-header-row">
+                    <div class="notification-app">
+                        <div class="app-icon"></div>
+                        <div class="app-name">Windows Update</div>
+                    </div>
+                    <div class="notification-actions">
+                        <button class="action-button close"></button>
+                    </div>
+                </div>
+                <div class="notification-title-text">Update Available</div>
+                <div class="notification-content">Windows has updates ready to install</div>
+                <div class="notification-time">8:15 AM</div>
+            </div>
+        </div>
+
+        <div class="notification-footer">
+            <button class="expand-button">Expand</button>
+            <button class="clear-all-button">Clear all notifications</button>
+        </div>
+
+        <div class="quick-actions">
+            <button class="quick-action">WiFi</button>
+            <button class="quick-action">Bluetooth</button>
+            <button class="quick-action">Focus</button>
+            <button class="quick-action">Battery</button>
+        </div>
+    </div>
+
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <button class="start-button" id="startButton"></button>
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="Type here to search">
+            <div class="search-icon"></div>
+        </div>
+        <div class="system-tray">
+            <button class="notification-button" id="notificationButton"></button>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

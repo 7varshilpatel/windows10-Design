@@ -1,0 +1,286 @@
+:root {
+    --bg: #0f172a;
+    --panel: #0f172a;
+    --fg: #e9eef5;
+    --muted: #9aa4b2;
+    --border-muted: rgba(255, 255, 255, 0.1);
+    --border-primary: #6366f1;
+    --ring: #6ea8fe;
+    --shadow: 0 10px 30px rgba(0, 0, 0, .35), 0 2px 10px rgba(0, 0, 0, .25);
+    --danger: #ef4444;
+    --unread: #3b82f6;
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg: #ffffff;
+        --panel: #ffffff;
+        --fg: #0d1220;
+        --muted: #5b6472;
+        --border-muted: #e7eaf0;
+        --ring: #3b82f6;
+        --shadow: 0 12px 30px rgba(17, 24, 39, .07), 0 2px 8px rgba(17, 24, 39, .05);
+    }
+}
+
+* {
+    box-sizing: border-box
+}
+
+body {
+    margin: 0;
+    font: 14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    background: var(--bg);
+    color: var(--fg);
+}
+
+nav {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 8px 16px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border-muted);
+    position: relative;
+}
+
+/* --- Icon button --- */
+.icon-btn {
+    --size: 40px;
+    display: inline-grid;
+    place-items: center;
+    width: var(--size);
+    height: var(--size);
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: var(--bg);
+    backdrop-filter: saturate(140%) blur(6px);
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .04) inset;
+    transition: transform .06s ease, box-shadow .2s ease, background .2s ease, border 0.1s ease, border-color .2s ease;
+    transition-delay: 0.15s;
+    position: relative;
+}
+
+.icon-btn:hover {
+    border: 1px solid var(--border-primary);
+    transition-delay: 0s;
+}
+
+.icon-btn:active {
+    transform: translateY(1px) scale(.99);
+}
+
+.icon-btn:focus,
+.icon-btn:focus-visible {
+    border: 1px solid var(--border-primary);
+}
+
+.icon-btn .icon {
+    display: inline-grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+}
+
+.icon-btn .icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+@keyframes swing {
+    0% {
+        transform: rotate(0deg);
+        transform-origin: top center;
+    }
+
+    20% {
+        transform: rotate(10deg);
+    }
+
+    40% {
+        transform: rotate(-8deg);
+    }
+
+    60% {
+        transform: rotate(6deg);
+    }
+
+    80% {
+        transform: rotate(-4deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+.swing {
+    animation: swing 1s ease-in-out infinite;
+    transform-origin: top center;
+}
+
+
+/* --- Popover --- */
+.popover {
+    position: absolute;
+    right: 16px;
+    top: calc(100% + 8px);
+    margin: 0;
+    min-width: 320px;
+    max-width: 420px;
+    background: var(--panel);
+    border: 1px solid var(--border-muted);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(4px) scale(.98);
+    pointer-events: none;
+    transition: opacity .14s ease, transform .14s ease;
+    overflow: hidden;
+}
+
+.popover[data-open="true"] {
+    opacity: 1;
+    transform: translateY(8px) scale(1);
+    pointer-events: auto;
+}
+
+.popover-header {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-muted);
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.popover-body {
+    max-height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Inbox scrollbar styling */
+.popover-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.popover-body::-webkit-scrollbar-thumb {
+    background: var(--border-muted);
+    border-radius: 4px;
+}
+
+.popover-body::-webkit-scrollbar-thumb:hover {
+    background: var(--muted);
+}
+
+.popover-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.clear-all {
+    font-size: 12px;
+    border: none;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.clear-all:hover {
+    color: var(--danger);
+}
+
+/* --- Toast --- */
+.toast {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 14px;
+    gap: 6px;
+    border-bottom: 1px solid var(--border-muted);
+    cursor: pointer;
+}
+
+.toast.unread {
+    background: rgba(59, 130, 246, .1);
+}
+
+.toast-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toast-controls {
+    display: flex;
+    gap: 6px;
+}
+
+.toast-controls button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.toast-controls button:hover {
+    color: var(--danger);
+}
+
+.toast-content {
+    display: none;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.toast.read .toast-content {
+    display: block;
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+    }
+}
+
+.toast.fade-out {
+    animation: fadeOut 0.3s ease forwards;
+}
+
+@keyframes shrink {
+    to {
+        transform: scale(0.8);
+        opacity: 0;
+        height: 0;
+        margin: 0;
+        padding: 0;
+    }
+}
+
+.toast.shrink {
+    animation: shrink 0.4s ease forwards;
+}
+
+.controls {
+    padding: 16px;
+    display: flex;
+    gap: 10px;
+}
+
+.controls button {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-muted);
+    cursor: pointer;
+    background: var(--panel);
+    color: var(--fg);
+}
+
+.controls button:hover {
+    background: rgba(255, 255, 255, .05);
+}

@@ -1,0 +1,181 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Search Bar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .search-container {
+            max-width: 500px;
+            margin: auto;
+            position: relative;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .results {
+            margin-top: 15px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+        }
+
+        .result-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        mark {
+            background: yellow;
+            font-weight: bold;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 15px;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="search-container">
+        <input type="text" id="searchBar" placeholder="Search items...">
+        <div id="results" class="results"></div>
+    </div>
+    <script>
+        const items = [
+            "JavaScript Basics",
+            "Advanced CSS Techniques",
+            "HTML5 for Beginners",
+            "Node.js and Express",
+            "Python Machine Learning",
+            "Data Structures and Algorithms",
+            "Artificial Intelligence",
+            "Cybersecurity Fundamentals",
+            "Wireless Security and Networks",
+            "React and Next.js Development"
+        ];
+        const searchBar = document.getElementById("searchBar");
+        const resultsDiv = document.getElementById("results");
+        function highlight(text, query) {
+            const regex = new RegExp(`(${query})`, "gi");
+            return text.replace(regex, "<mark>$1</mark>");
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = searchBar
+            const ctrlKey = document.getElementById('ctrlKey');
+            
+            // Detect if the user is on a Mac to show the correct modifier key
+            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+            if (isMac) {
+                ctrlKey.textContent = 'Cmd';
+            }
+            
+            // Add global keydown event listener
+            document.addEventListener('keydown', function(event) {
+                // Check for Ctrl+K or Cmd+K
+                if ((event.ctrlKey && event.key === 'k') || (event.metaKey && event.key === 'k')) {
+                    event.preventDefault(); // Prevent browser search
+                    searchInput.focus();
+                }
+                
+                // Allow Escape to blur the search input
+                if (event.key === 'Escape' && document.activeElement === searchInput) {
+                    searchInput.blur();
+                }
+            });
+            
+            // Prevent the shortcut from triggering when typing in the search box
+            searchInput.addEventListener('keydown', function(event) {
+                if ((event.ctrlKey && event.key === 'k') || (event.metaKey && event.key === 'k')) {
+                    event.stopPropagation();
+                }
+            });
+        });
+        function search(query) {
+            resultsDiv.innerHTML = "";
+            if (!query.trim()) {
+                return;
+            }
+            const keywords = query.toLowerCase().split(/\s+/); // multiple keywords
+            const filtered = items.filter(item =>
+                keywords.every(word => item.toLowerCase().includes(word))
+            );
+            if (filtered.length === 0) {
+                resultsDiv.innerHTML = `<div class="no-results">No results found</div>`;
+                return;
+            }
+            filtered.forEach(item => {
+                let highlighted = item;
+                keywords.forEach(word => {
+                    highlighted = highlight(highlighted, word);
+                });
+                const div = document.createElement("div");
+                div.classList.add("result-item");
+                div.innerHTML = highlighted;
+                resultsDiv.appendChild(div);
+            });
+        }
+        searchBar.addEventListener("input", e => {
+            search(e.target.value);
+        });
+        // Extra functionality: fuzzy search (partial word matches beyond includes)
+        function fuzzyMatch(text, query) {
+            const pattern = query.split("").map(c => c.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')).join(".*?");
+            const regex = new RegExp(pattern, "i");
+            return regex.test(text);
+        }
+        function search(query) {
+            resultsDiv.innerHTML = "";
+            if (!query.trim()) return;
+            const keywords = query.toLowerCase().split(/\s+/);
+            const filtered = items.filter(item =>
+                keywords.every(word =>
+                    item.toLowerCase().includes(word) || fuzzyMatch(item, word)
+                )
+            );
+            if (filtered.length === 0) {
+                resultsDiv.innerHTML = `<div class="no-results">No results found</div>`;
+                return;
+            }
+            filtered.forEach(item => {
+                let highlighted = item;
+                keywords.forEach(word => {
+                    highlighted = highlight(highlighted, word);
+                });
+                const div = document.createElement("div");
+                div.classList.add("result-item");
+                div.innerHTML = highlighted;
+                resultsDiv.appendChild(div);
+            });
+        }
+        // Add Enter key support: search executes on Enter too
+        searchBar.addEventListener("keypress", e => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                search(e.target.value);
+            }
+        });
+    </script>
+</body>
+
+</html>

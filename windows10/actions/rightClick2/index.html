@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed Windows-Style Right-Click Menu</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <div class="theme-selector">
+        <button class="theme-btn" data-theme="dark">Dark Theme</button>
+        <button class="theme-btn" data-theme="light">Light Theme</button>
+        <button class="theme-btn" data-theme="blue">Blue Theme</button>
+        <button class="theme-btn" data-theme="green">Green Theme</button>
+    </div>
+
+    <!-- The custom context menu -->
+    <div class="windows-menu" id="contextMenu">
+        <div class="menu-item">
+            <i>📄</i> <span>View</span>
+            <span class="shortcut">Ctrl+V</span>
+        </div>
+        <div class="menu-item">
+            <i>📋</i> <span>Copy</span>
+            <span class="shortcut">Ctrl+C</span>
+        </div>
+        <div class="menu-item">
+            <i>📁</i> <span>Paste</span>
+            <span class="shortcut">Ctrl+P</span>
+        </div>
+        <div class="menu-item">
+            <i>✂️</i> <span>Cut</span>
+            <span class="shortcut">Ctrl+X</span>
+        </div>
+        <div class="menu-separator"></div>
+        <div class="menu-item has-submenu">
+            <i>🔄</i> <span>Refresh</span>
+            <span class="menu-arrow">▶</span>
+            <div class="submenu">
+                <div class="menu-item">Normal Refresh</div>
+                <div class="menu-item">Hard Refresh</div>
+                <div class="menu-item">Empty Cache and Refresh</div>
+            </div>
+        </div>
+        <div class="menu-item">
+            <i>🔍</i> <span>Search</span>
+        </div>
+        <div class="menu-item has-submenu">
+            <i>⚙️</i> <span>Settings</span>
+            <span class="menu-arrow">▶</span>
+            <div class="submenu">
+                <div class="menu-item">System</div>
+                <div class="menu-item">Display</div>
+                <div class="menu-item">Personalization</div>
+                <div class="menu-separator"></div>
+                <div class="menu-item">Privacy</div>
+                <div class="menu-item">Update & Security</div>
+            </div>
+        </div>
+        <div class="menu-separator"></div>
+        <div class="menu-item">
+            <i>❌</i> <span>Exit</span>
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>

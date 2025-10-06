@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Notification Button + Inbox Popover</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <nav>
+        <button id="notificationBtn" class="icon-btn" aria-haspopup="dialog" aria-expanded="false"
+            aria-controls="popover">
+            <span class="icon" id="notificationIcon">
+                <!-- Replace with default notification SVG -->
+                <svg viewBox="0 0 12 13" xmlns="http://www.w3.org/2000/svg" fill="var(--fg)">
+                    <path
+                        d="M6.35 0c-.8 0-.83.57-.83.84v.52c-1.18.23-1.98.96-2.62 1.98-.68 1.08-.11 3.03-.48 4.05-.37 1.02-1.38 2.2-1.52 2.34-.14.14.16.44.37.44l10.25-.02c.16 0 .44-.23.29-.42-.15-.19-1.05-1.05-1.44-2.03-.39-.97.19-3.09-.52-4.24C9.19 2.39 8.39 1.59 7.18 1.37V.85C7.18.59 7.15 0 6.35 0Zm-2.31 11.23c.29.99.72 1.47 2.31 1.47 1.59 0 2.02-.48 2.31-1.47H4.04Z" />
+                </svg>
+            </span>
+            <!-- <span class="sr-only">Notifications</span> -->
+        </button>
+
+        <!-- Popover Inbox -->
+        <div id="popover" class="popover" role="dialog" aria-modal="false" hidden>
+            <div class="popover-header">
+                <span>Inbox</span>
+                <button class="clear-all" id="clearAll">Clear All</button>
+            </div>
+            <div class="popover-body" id="toastContainer"></div>
+        </div>
+    </nav>
+
+    <div class="controls">
+        <button id="addToast1">Add Toast 1</button>
+        <button id="addToast2">Add Toast 2</button>
+        <button id="addToast3">Add Toast 3</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

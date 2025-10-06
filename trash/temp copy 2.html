@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Notification Panel – Pixel-Exact Replica</title>
+    <style>
+        :root {
+            /* Canvas & layout */
+            --canvas-w: 1595px;
+            --canvas-h: 896px;
+            --taskbar-h: 72.2408px;
+            --right-panel-w: 423px;
+            --panel-pad-x: 16px;
+            /* derived ≈ (423 - 391.723)/2 */
+            --panel-pad-top: 59px;
+            /* first header y in SVG */
+            --group-gap: 23px;
+            /* spacing between card and next header */
+            --header-h: 53.1702px;
+            --card-h: 99.8298px;
+
+            /* Colors (from SVG) */
+            --bg: #13162C;
+            --taskbar: #1C1C1C;
+            --taskbar-right: #292929;
+            --search-bg: #333333;
+            --search-border: #5C5C5C;
+            --panel-bg: #23262A;
+            --card-bg: #29292A;
+            --icon: #D9D9D9;
+            --pure: #FFFEFE;
+
+            /* Extras */
+            --radius: 8px;
+            --shadow: 0 0 0 1px rgba(0, 0, 0, .25), 0 2px 6px rgba(0, 0, 0, .35);
+            --scrollbar-w: 10px;
+
+            /* Scaling helper so design always fits viewport without breaking pixel ratios */
+            --scale: 1;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                color-scheme: dark;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            background: #000;
+            margin: 0;
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        }
+
+        /* Stage container (centers the exact-sized canvas and scales it responsively) */
+        .stage {
+            height: 100%;
+            width: 100%;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            background: radial-gradient(1200px 800px at 50% 40%, #0b0e21 0%, #05060f 60%, #000 100%);
+        }
+
+        .canvas-wrap {
+            width: calc(var(--canvas-w) * var(--scale));
+            height: calc(var(--canvas-h) * var(--scale));
+            transform: translateZ(0);
+            /* GPU snap */
+        }
+
+        /* Pixel-exact canvas (absolute positioning grid) */
+        .canvas {
+            position: relative;
+            width: var(--canvas-w);
+            height: var(--canvas-h);
+            background: var(--bg);
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, .5);
+            transform: scale(var(--scale));
+            transform-origin: 50% 50%;
+        }
+
+        /* ===== RIGHT NOTIFICATION PANEL ===== */
+        .right-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: var(--right-panel-w);
+            height: calc(var(--canvas-h) - var(--taskbar-h));
+            background: var(--panel-bg);
+            box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.02);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-scroll {
+            position: relative;
+            padding: var(--panel-pad-top) var(--panel-pad-x) 24px;
+            height: 100%;
+            overflow: auto;
+        }
+
+        /* Custom scrollbar to match “scrollbar” design */
+        .panel-scroll::-webkit-scrollbar {
+            width: var(--scrollbar-w);
+        }
+
+        .panel-scroll::-webkit-scrollbar-track {
+            background: #1b1e22;
+            border-left: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .panel-scroll::-webkit-scrollbar-thumb {
+            background: #3f444a;
+            border: 2px solid #1b1e22;
+            border-radius: 12px;
+        }
+
+        .panel-scroll {
+            scrollbar-color: #3f444a #1b1e22;
+            /* Firefox */
+            scrollbar-width: thin;
+        }
+
+        /* Group: header + card */
+        .noti-group {
+            width: 100%;
+            margin-bottom: var(--group-gap);
+        }
+
+        .noti-header {
+            position: relative;
+            height: var(--header-h);
+            background: var(--panel-bg);
+            /* same as panel (exact) */
+            display: grid;
+            grid-template-columns: 28px 1fr 56px;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Little 18.4468px square icon at ~116px from header start.
+       We'll place an app icon to the left, and offset its inner square to line up visually. */
+        .noti-app {
+            width: 28px;
+            height: 28px;
+            margin-left: 88px;
+            /* 16 (panel pad) + ~72 ≈ 116 alignment in visual space */
+            position: relative;
+        }
+
+        .noti-app::before {
+            content: "";
+            position: absolute;
+            width: 18.4468px;
+            height: 18.4468px;
+            inset: 0;
+            margin: auto;
+            background: var(--icon);
+            border-radius: 3px;
+            box-shadow:
+                0 0 0 1px rgba(0, 0, 0, .25),
+                0 0 0 2px rgba(255, 255, 255, .02) inset;
+        }
+
+        .noti-title {
+            height: 14px;
+            position: relative;
+        }
+
+        /* Title as two subtle bars (text was path-outlined in SVG) */
+        .noti-title::before,
+        .noti-title::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 30%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 2px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .noti-title::after {
+            right: 55%;
+            top: calc(50% + 11px);
+            height: 6px;
+            opacity: .75;
+        }
+
+        .header-controls {
+            position: relative;
+            height: 100%;
+            display: grid;
+            grid-auto-flow: column;
+            align-content: center;
+            justify-content: end;
+            gap: 8px;
+            padding-right: 10px;
+        }
+
+        /* Close “X” built from two tiny 1.08511px bars rotated at 45° (matching SVG proportions) */
+        .icon-x {
+            position: relative;
+            width: 18px;
+            height: 18px;
+            display: inline-block;
+        }
+
+        .icon-x::before,
+        .icon-x::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 1.08511px;
+            height: 16.2766px;
+            background: var(--icon);
+            border-radius: 0.542553px;
+            transform-origin: center;
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        .icon-x::after {
+            transform: translate(-50%, -50%) rotate(-45deg);
+        }
+
+        /* Little “chevron pair” below the X (short bars ~8.4px) */
+        .icon-chev {
+            position: relative;
+            width: 18px;
+            height: 18px;
+            display: inline-block;
+        }
+
+        .icon-chev::before,
+        .icon-chev::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 60%;
+            width: 1.08511px;
+            height: 8.68119px;
+            background: var(--icon);
+            border-radius: 0.542553px;
+            transform-origin: center;
+            transform: translate(-50%, -50%) rotate(45deg);
+            opacity: .95;
+        }
+
+        .icon-chev::after {
+            transform: translate(-50%, -50%) rotate(-45deg);
+        }
+
+        /* Card body beneath header (semi-opaque #29292A @ 0.84 in SVG) */
+        .noti-card {
+            margin-top: 0;
+            height: var(--card-h);
+            background: color-mix(in oklab, var(--card-bg) 84%, transparent);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            position: relative;
+            display: grid;
+            grid-template-columns: 56px 1fr 56px;
+            gap: 12px;
+            padding: 16px 14px;
+        }
+
+        /* Left icon stack inside the card */
+        .card-icon {
+            position: relative;
+            width: 56px;
+            height: 56px;
+            align-self: center;
+            justify-self: center;
+            border-radius: 12px;
+            background: linear-gradient(180deg, #6b7a96, #3a455a);
+            box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.06), 0 6px 14px rgba(0, 0, 0, .35);
+        }
+
+        .card-icon::before {
+            content: "";
+            position: absolute;
+            inset: 12px;
+            border-radius: 8px;
+            background: #dfe6f3;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, .15) inset;
+            mix-blend-mode: screen;
+            opacity: .85;
+        }
+
+        /* Middle “text lines” */
+        .card-lines {
+            position: relative;
+            align-self: center;
+            height: 56px;
+        }
+
+        .card-lines .line {
+            height: 10px;
+            margin: 6px 0;
+            background: rgba(255, 255, 255, .16);
+            border-radius: 3px;
+        }
+
+        .card-lines .line:nth-child(2) {
+            width: 78%;
+            opacity: .8;
+        }
+
+        .card-lines .line:nth-child(3) {
+            width: 62%;
+            opacity: .65;
+        }
+
+        .card-lines .line:nth-child(4) {
+            width: 48%;
+            opacity: .45;
+        }
+
+        .card-lines .line:first-child {
+            width: 88%;
+        }
+
+        /* Right-side slim controls inside card */
+        .card-controls {
+            position: relative;
+            align-self: center;
+            justify-self: center;
+            width: 28px;
+            height: 56px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .35);
+            margin: 7px auto;
+        }
+
+        /* ===== BOTTOM TASKBAR ===== */
+        .taskbar {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: var(--taskbar-h);
+            background: var(--taskbar);
+            display: grid;
+            grid-template-columns: 72.2408px auto 72.2408px;
+            align-items: stretch;
+        }
+
+        /* Left square tile (72x72) with a custom white “start” glyph */
+        .tb-left {
+            position: relative;
+            background: var(--taskbar);
+            display: grid;
+            place-items: center;
+        }
+
+        .start-glyph {
+            position: relative;
+            width: 40px;
+            height: 40px;
+        }
+
+        .start-glyph::before,
+        .start-glyph::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            margin: auto;
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--pure);
+            border-radius: 3px;
+            clip-path: polygon(0 0, 48% 0, 48% 48%, 0 48%, 0 0,
+                    52% 0, 100% 0, 100% 48%, 52% 48%, 52% 0,
+                    0 52%, 48% 52%, 48% 100%, 0 100%, 0 52%,
+                    52% 52%, 100% 52%, 100% 100%, 52% 100%, 52% 52%);
+            /* creates a four-pane window mark */
+        }
+
+        .start-glyph::after {
+            display: none;
+        }
+
+        /* Center search field area (x: 72.9412 → width: 442.747, height: 70.8408) */
+        .tb-center {
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding-left: 72.9412px;
+            /* aligns left border exactly */
+        }
+
+        .search {
+            width: 442.747px;
+            height: 70.8408px;
+            background: var(--search-bg);
+            border: 1.4px solid var(--search-border);
+            border-radius: 8px;
+            position: relative;
+            display: grid;
+            grid-template-columns: 44px 1fr 44px;
+            align-items: center;
+        }
+
+        .search .magnifier {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #C9C9C9;
+            border-radius: 50%;
+            margin-left: 18px;
+            position: relative;
+        }
+
+        .search .magnifier::after {
+            content: "";
+            position: absolute;
+            right: -6px;
+            bottom: -6px;
+            width: 10px;
+            height: 2px;
+            background: #C9C9C9;
+            transform: rotate(45deg);
+            border-radius: 2px;
+            transform-origin: right center;
+        }
+
+        .search .placeholder {
+            height: 12px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, .2);
+            width: 70%;
+        }
+
+        .search .kbd {
+            margin-right: 14px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, .7);
+            padding: 4px 6px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, .2);
+            background: rgba(255, 255, 255, .06);
+            text-align: center;
+            user-select: none;
+        }
+
+        /* Right system tray block (72.2408px) */
+        .tb-right {
+            background: var(--taskbar-right);
+            position: relative;
+        }
+
+        /* ===== STATES =====
+       Default: “scrollbar” (enough content to require scroll)
+       Alternate: “settings-collapsed” (collapse middle card bodies)
+    */
+        body.state-settings-collapsed .noti-group[data-collapsible="true"] .noti-card {
+            height: 0px;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+            border-radius: 0;
+            box-shadow: none;
+            border-top: 1px solid rgba(255, 255, 255, .04);
+            border-bottom: 1px solid rgba(255, 255, 255, .04);
+        }
+
+        /* ===== RESPONSIVE SCALE ===== */
+        @media (max-width: 1650px),
+        (max-height: 950px) {
+
+            /* Scale to fit smallest dimension while preserving exact proportions */
+            .canvas-wrap {
+                --scale: calc(min(100vw / var(--canvas-w), 100vh / var(--canvas-h)));
+            }
+        }
+    </style>
+</head>
+
+<body class="state-scrollbar">
+    <main class="stage" role="application" aria-label="Pixel-Exact UI Canvas">
+        <div class="canvas-wrap">
+            <div class="canvas" aria-hidden="false">
+                <!-- RIGHT NOTIFICATION PANEL -->
+                <aside class="right-panel" aria-label="Notification Center">
+                    <div class="panel-scroll" tabindex="0">
+                        <!-- GROUP 1 -->
+                        <section class="noti-group" aria-label="Group 1">
+                            <header class="noti-header" role="group" aria-label="Header">
+                                <div class="noti-app" aria-hidden="true"></div>
+                                <div class="noti-title" aria-hidden="true"></div>
+                                <div class="header-controls" aria-hidden="true">
+                                    <i class="icon-x" aria-hidden="true"></i>
+                                    <i class="icon-chev" aria-hidden="true"></i>
+                                </div>
+                            </header>
+                            <div class="noti-card" role="region" aria-label="Card">
+                                <div class="card-icon" aria-hidden="true"></div>
+                                <div class="card-lines" aria-hidden="true">
+                                    <div class="line"></div>
+                                    <div class="line"></div>
+                                    <div class="line"></div>
+                                    <div class="line"></div>
+                                </div>
+                                <div class="card-controls" aria-hidden="true">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- GROUP 2 (collapsible to match “setting-collapse”) -->
+                        <section class="noti-group" data-collapsible="true" aria-label="Group 2">
+                            <header class="noti-header" role="group" aria-label="Header">
+                                <div class="noti-app" aria-hidden="true"></div>
+                                <div class="noti-title" aria-hidden="true"></div>
+                                <div class="header-controls" aria-hidden="true">
+                                    <i class="icon-x" aria-hidden="true"></i>
+                                    <i class="icon-chev" aria-hidden="true"></i>
+                                </div>
+                            </header>
+                            <div class="noti-card" role="region" aria-label="Card">
+                                <div class="card-icon" aria-hidden="true"></div>
+                                <div class="card-lines" aria-hidden="true">
+                                    <div class="line"></div>
+                                    <div class="line"></div>
+                                    <div class="line"></div>
+                                    <div class="line"></div>
+                                </div>
+                                <div class="card-controls" aria-hidden="true">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- GROUP 3 -->
+                        <section class="noti-group" aria-label="Group 3">
+                            <header class="noti-header" role="group" aria-label="Header">
+                                <div class="noti-app" aria-hidden="true"></div>
+                                <div class="noti-title" aria-hidden="true"></div>
+                                <div class="header-controls" aria-hidden="true">
+                                    <i class="icon-x" aria-hidden="true"></i>
+                                    <i class="icon-chev" aria-hidden="true"></i>
+                                </div>
+                            </header>
+                            <div class="noti-card" role="region" aria-label="Card">
+                                <div class="card-icon" aria-hidden="true"></div>
+                                <div class="card-lines" aria-hidden="true">
+                                    <div class="line"></div>
+                                    <div class="line"></div>
+                                    <div class="line"></div>
+                                    <div class="line"></div>
+                                </div>
+                                <div class="card-controls" aria-hidden="true">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Extra filler blocks to ensure scrollbar visibility in “scrollbar” state -->
+                        <section class="noti-group" aria-hidden="true">
+                            <header class="noti-header">
+                                <div class="noti-app"></div>
+                                <div class="noti-title"></div>
+                                <div class="header-controls"><i class="icon-x"></i><i class="icon-chev"></i></div>
+                            </header>
+                            <div class="noti-card">
+                                <div class="card-icon"></div>
+                                <div class="card-lines">
+                                    <div class="line"></div>
+                                    <div class="line"></div>
+                                    <div class="line"></div>
+                                    <div class="line"></div>
+                                </div>
+                                <div class="card-controls">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="noti-group" aria-hidden="true">
+                            <header class="noti-header">
+                                <div class="noti-app"></div>
+                                <div class="noti-title"></div>
+                                <div class="header-controls"><i class="icon-x"></i><i class="icon-chev"></i></div>
+                            </header>
+                            <div class="noti-card">
+                                <div class="card-icon"></div>
+                                <div class="card-lines">
+                                    <div class="line"></div>
+                                    <div class="line"></div>
+                                    <div class="line"></div>
+                                    <div class="line"></div>
+                                </div>
+                                <div class="card-controls">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </aside>
+
+                <!-- BOTTOM TASKBAR -->
+                <footer class="taskbar" role="contentinfo" aria-label="Taskbar">
+                    <div class="tb-left">
+                        <div class="start-glyph" aria-hidden="true"></div>
+                    </div>
+                    <div class="tb-center">
+                        <div class="search" role="search">
+                            <div class="magnifier" aria-hidden="true"></div>
+                            <div class="placeholder" aria-hidden="true"></div>
+                            <div class="kbd" aria-hidden="true">⌘K</div>
+                        </div>
+                    </div>
+                    <div class="tb-right" aria-hidden="true"></div>
+                </footer>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        'use strict';
+
+        // Scale canvas to fit viewport while preserving the exact 1595x896 ratio
+        const wrap = document.querySelector('.canvas-wrap');
+        const CANVAS_W = 1595;
+        const CANVAS_H = 896;
+
+        function applyScale() {
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            const scale = Math.min(vw / CANVAS_W, vh / CANVAS_H);
+            wrap.style.setProperty('--scale', scale.toString());
+        }
+        applyScale();
+        window.addEventListener('resize', applyScale);
+
+        // Keyboard toggles for the two provided SVG states (no visible UI added):
+        //  - Press "S" to toggle “settings-collapsed” state
+        //  - Press "B" to toggle back to “scrollbar” state (adds enough content to show scroll)
+        const body = document.body;
+        function setState(collapsed) {
+            body.classList.toggle('state-settings-collapsed', collapsed);
+        }
+        window.addEventListener('keydown', (e) => {
+            const k = e.key.toLowerCase();
+            if (k === 's') {
+                setState(true);
+            } else if (k === 'b') {
+                setState(false);
+            }
+        });
+
+        // Accessibility: ensure scroll container is focusable for keyboard users
+        const scroll = document.querySelector('.panel-scroll');
+        scroll.addEventListener('keydown', (e) => {
+            // basic PgUp/PgDn handling
+            if (e.key === 'PageDown') { scroll.scrollBy({ top: 200, behavior: 'smooth' }); }
+            if (e.key === 'PageUp') { scroll.scrollBy({ top: -200, behavior: 'smooth' }); }
+        });
+    </script>
+</body>
+
+</html>

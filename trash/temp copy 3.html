@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Notification Panel – Fixed Pixel Design</title>
+    <style>
+        :root {
+            --canvas-w: 1595px;
+            --canvas-h: 896px;
+            --taskbar-h: 72px;
+            --right-panel-w: 423px;
+            --header-h: 54px;
+            --card-h: 100px;
+
+            --bg: #13162C;
+            --panel-bg: #23262A;
+            --card-bg: #29292A;
+            --taskbar: #1C1C1C;
+            --taskbar-right: #292929;
+            --search-bg: #333333;
+            --search-border: #5C5C5C;
+            --icon: #D9D9D9;
+            --pure: #FFFEFE;
+
+            --radius: 8px;
+            --shadow: 0 0 0 1px rgba(0, 0, 0, .25), 0 2px 6px rgba(0, 0, 0, .35);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            height: 100%;
+            background: #000;
+            font-family: system-ui, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .canvas {
+            position: relative;
+            width: var(--canvas-w);
+            height: var(--canvas-h);
+            background: var(--bg);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, .5);
+            overflow: hidden;
+        }
+
+        /* Right Panel */
+        .right-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: var(--right-panel-w);
+            height: calc(var(--canvas-h) - var(--taskbar-h));
+            background: var(--panel-bg);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-scroll {
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .panel-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .panel-scroll::-webkit-scrollbar-thumb {
+            background: #3f444a;
+            border-radius: 6px;
+        }
+
+        .panel-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: #3f444a #1b1e22;
+        }
+
+        .noti-group {
+            margin-bottom: 24px;
+        }
+
+        .noti-header {
+            height: var(--header-h);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .noti-app {
+            width: 20px;
+            height: 20px;
+            background: var(--icon);
+            border-radius: 3px;
+        }
+
+        .noti-title {
+            flex: 1;
+            margin-left: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, .18);
+            border-radius: 2px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-x,
+        .icon-chev {
+            width: 14px;
+            height: 14px;
+            position: relative;
+        }
+
+        .icon-x::before,
+        .icon-x::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 100%;
+            background: var(--icon);
+            transform-origin: center;
+        }
+
+        .icon-x::before {
+            transform: rotate(45deg);
+        }
+
+        .icon-x::after {
+            transform: rotate(-45deg);
+        }
+
+        .icon-chev::before,
+        .icon-chev::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 60%;
+            background: var(--icon);
+        }
+
+        .icon-chev::before {
+            transform: rotate(45deg);
+        }
+
+        .icon-chev::after {
+            transform: rotate(-45deg);
+        }
+
+        .noti-card {
+            margin-top: 8px;
+            height: var(--card-h);
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            gap: 12px;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            background: linear-gradient(180deg, #6b7a96, #3a455a);
+        }
+
+        .card-lines {
+            flex: 1;
+        }
+
+        .line {
+            height: 8px;
+            background: rgba(255, 255, 255, .2);
+            border-radius: 4px;
+            margin: 4px 0;
+        }
+
+        .line:nth-child(2) {
+            width: 80%;
+        }
+
+        .line:nth-child(3) {
+            width: 60%;
+        }
+
+        .line:nth-child(4) {
+            width: 40%;
+        }
+
+        .card-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .35);
+        }
+
+        /* Taskbar */
+        .taskbar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--taskbar-h);
+            background: var(--taskbar);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .tb-left,
+        .tb-right {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .start-glyph {
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--pure);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+        }
+
+        .start-glyph div {
+            border: 1px solid var(--pure);
+        }
+
+        .tb-center .search {
+            display: flex;
+            align-items: center;
+            width: 420px;
+            height: 50px;
+            background: var(--search-bg);
+            border: 1px solid var(--search-border);
+            border-radius: var(--radius);
+            padding: 0 12px;
+            gap: 12px;
+        }
+
+        .magnifier {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #C9C9C9;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .magnifier::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            width: 8px;
+            height: 2px;
+            background: #C9C9C9;
+            transform: rotate(45deg);
+        }
+
+        .placeholder {
+            flex: 1;
+            height: 10px;
+            background: rgba(255, 255, 255, .2);
+            border-radius: 3px;
+        }
+
+        .kbd {
+            font-size: 12px;
+            padding: 4px 6px;
+            border: 1px solid rgba(255, 255, 255, .2);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, .06);
+            color: rgba(255, 255, 255, .7);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="canvas">
+        <!-- Right Panel -->
+        <aside class="right-panel">
+            <div class="panel-scroll">
+                <section class="noti-group">
+                    <header class="noti-header">
+                        <div class="noti-app"></div>
+                        <div class="noti-title"></div>
+                        <div class="header-controls">
+                            <i class="icon-x"></i>
+                            <i class="icon-chev"></i>
+                        </div>
+                    </header>
+                    <div class="noti-card">
+                        <div class="card-icon"></div>
+                        <div class="card-lines">
+                            <div class="line"></div>
+                            <div class="line"></div>
+                            <div class="line"></div>
+                            <div class="line"></div>
+                        </div>
+                        <div class="card-controls">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </aside>
+
+        <!-- Taskbar -->
+        <footer class="taskbar">
+            <div class="tb-left">
+                <div class="start-glyph">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+            <div class="tb-center">
+                <div class="search">
+                    <div class="magnifier"></div>
+                    <div class="placeholder"></div>
+                    <div class="kbd">⌘K</div>
+                </div>
+            </div>
+            <div class="tb-right"></div>
+        </footer>
+    </div>
+</body>
+
+</html>

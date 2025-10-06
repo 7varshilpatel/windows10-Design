@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Start Menu</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Main Start Menu Container -->
+    <div class="start-menu">
+        <!-- Left Sidebar with App List -->
+        <nav class="sidebar" role="navigation">
+            <header class="sidebar-header">
+                <button class="hamburger-menu" aria-label="Menu">☰</button>
+            </header>
+
+            <!-- Recently Added Section -->
+            <section class="app-list">
+                <h2 class="section-title">Recently added</h2>
+                <button class="app-item">
+                    <div class="app-icon whatsapp">💬</div>
+                    <span class="app-name">WhatsApp</span>
+                </button>
+
+                <h2 class="section-title" style="margin-top: 24px;">A</h2>
+                <button class="app-item">
+                    <div class="app-icon viewer-3d">📦</div>
+                    <span class="app-name">3D Viewer</span>
+                </button>
+                <button class="app-item">
+                    <div class="app-icon access">🗃️</div>
+                    <span class="app-name">Access</span>
+                </button>
+                <button class="app-item">
+                    <div class="app-icon adobe">📄</div>
+                    <span class="app-name">Adobe Reader 9</span>
+                </button>
+                <button class="app-item">
+                    <div class="app-icon clock">⏰</div>
+                    <span class="app-name">Alarms & Clock</span>
+                </button>
+
+                <h2 class="section-title" style="margin-top: 24px;">B</h2>
+                <button class="app-item">
+                    <div class="app-icon brave">🦁</div>
+                    <span class="app-name">Brave</span>
+                </button>
+
+                <h2 class="section-title" style="margin-top: 24px;">C</h2>
+                <button class="app-item">
+                    <div class="app-icon calculator">🧮</div>
+                    <span class="app-name">Calculator</span>
+                </button>
+                <button class="app-item">
+                    <div class="app-icon calendar">📅</div>
+                    <span class="app-name">Calendar</span>
+                </button>
+                <button class="app-item">
+                    <div class="app-icon camera">📷</div>
+                    <span class="app-name">Camera</span>
+                </button>
+                <button class="app-item">
+                    <div class="app-icon connect">🔗</div>
+                    <span class="app-name">Connect</span>
+                </button>
+
+                <h2 class="section-title" style="margin-top: 24px;">E</h2>
+                <button class="app-item">
+                    <div class="app-icon excel">📊</div>
+                    <span class="app-name">Excel</span>
+                </button>
+            </section>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <button class="nav-icon" aria-label="Documents">📄</button>
+                <button class="nav-icon" aria-label="Pictures">🖼️</button>
+                <button class="nav-icon" aria-label="Settings">⚙️</button>
+                <button class="nav-icon" aria-label="Power">⏻</button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area with Tiles -->
+        <main class="main-content">
+            <!-- Productivity Section -->
+            <section class="content-section">
+                <h1 class="section-header">Productivity</h1>
+                <div class="tile-grid">
+                    <a href="#" class="tile tile-medium office">
+                        <div class="tile-icon">📄</div>
+                        <div class="tile-name">Office</div>
+                    </a>
+                    <a href="#" class="tile calculator">
+                        <div class="tile-icon">🧮</div>
+                        <div class="tile-name">Calculator</div>
+                    </a>
+                    <a href="#" class="tile excel">
+                        <div class="tile-icon">📊</div>
+                        <div class="tile-name">Excel</div>
+                    </a>
+                    <a href="#" class="tile calendar">
+                        <div class="tile-icon">📅</div>
+                        <div class="tile-name">Calendar</div>
+                    </a>
+                    <a href="#" class="tile edge">
+                        <div class="tile-icon">🌐</div>
+                        <div class="tile-name">Microsoft Edge</div>
+                    </a>
+                    <a href="#" class="tile photos">
+                        <div class="tile-icon">🖼️</div>
+                        <div class="tile-name">Photos</div>
+                    </a>
+                    <a href="#" class="tile linkedin">
+                        <div class="tile-icon">💼</div>
+                        <div class="tile-name">LinkedIn</div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Explore Section -->
+            <section class="content-section">
+                <h1 class="section-header">Explore</h1>
+                <div class="tile-grid">
+                    <a href="#" class="tile store">
+                        <div class="tile-icon">🏪</div>
+                        <div class="tile-name">Microsoft Store</div>
+                    </a>
+                    <a href="#" class="tile calculator">
+                        <div class="tile-icon">🧮</div>
+                        <div class="tile-name">Calculator</div>
+                    </a>
+                    <a href="#" class="tile todo">
+                        <div class="tile-icon">✓</div>
+                        <div class="tile-name">Microsoft To...</div>
+                    </a>
+                    <a href="#" class="tile movies">
+                        <div class="tile-icon">🎬</div>
+                        <div class="tile-name">Movies & TV</div>
+                    </a>
+                    <a href="#" class="tile solitaire">
+                        <div class="tile-icon">🃏</div>
+                        <div class="tile-name">Microsoft Solitaire Collection</div>
+                    </a>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

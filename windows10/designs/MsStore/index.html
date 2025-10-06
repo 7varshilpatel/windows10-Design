@@ -1,0 +1,1167 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Microsoft Store</title>
+  <style>
+    /* ===== Variables & Base ===== */
+    :root {
+      --bg: #202020;
+      --sidebar-bg: #2b2b2b;
+      --muted: #8a8a8a;
+      --accent: #0067c0;
+      --accent-hover: #005a9e;
+      --text-primary: #ffffff;
+      --text-secondary: #b4b4b4;
+      --hover-bg: rgba(255, 255, 255, 0.06);
+      --active-bg: rgba(255, 255, 255, 0.08);
+      --border: #3a3a3a;
+      font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ===== Layout ===== */
+    .app {
+      width: 100%;
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+    }
+
+    /* ===== Sidebar ===== */
+    .sidebar {
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 8px 0;
+    }
+
+    .brand .logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #0078d4 0%, #50e6ff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 16px;
+      color: white;
+    }
+
+    .brand h1 {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .nav {
+      padding: 8px 0;
+    }
+
+    .nav button {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 10px 16px;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 14px;
+      text-align: left;
+      transition: background 0.1s ease;
+    }
+
+    .nav button:hover {
+      background: var(--hover-bg);
+    }
+
+    .nav button.active {
+      background: var(--active-bg);
+      border-left: 3px solid var(--accent);
+      padding-left: 13px;
+    }
+
+    .nav svg {
+      opacity: 0.9;
+      flex-shrink: 0;
+    }
+
+    .filters {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .filter-title {
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .chip {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 2px;
+      margin: 0 8px 8px 0;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.1s ease;
+    }
+
+    .chip:hover {
+      background: var(--hover-bg);
+      border-color: var(--muted);
+    }
+
+    .chip.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    /* ===== Main area ===== */
+    .main {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .topbar {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .search {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 8px 12px;
+      min-width: 400px;
+      transition: border-color 0.2s;
+    }
+
+    .search:focus-within {
+      border-color: var(--accent);
+    }
+
+    .search input {
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 14px;
+      width: 100%;
+      font-family: inherit;
+    }
+
+    .search input::placeholder {
+      color: var(--muted);
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 4px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.1s ease;
+    }
+
+    .btn:hover {
+      background: var(--hover-bg);
+      border-color: var(--muted);
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      color: white;
+      border: none;
+    }
+
+    .btn.primary:hover {
+      background: var(--accent-hover);
+    }
+
+    /* ===== Content Area ===== */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    /* ===== Hero ===== */
+    .hero {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .hero-card {
+      background: linear-gradient(135deg, #0078d4 0%, #50e6ff 100%);
+      border-radius: 8px;
+      padding: 32px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 100%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="80" fill="rgba(255,255,255,0.1)"/></svg>') no-repeat center;
+      opacity: 0.3;
+    }
+
+    .hero-meta {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      font-size: 14px;
+      opacity: 0.95;
+      margin-bottom: 20px;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 12px;
+    }
+
+    .hero-cta .btn {
+      background: white;
+      color: #0078d4;
+      border: none;
+    }
+
+    .hero-cta .btn:hover {
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .hero-cta .btn:last-child {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .hero-cta .btn:last-child:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .promo {
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .promo .big {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .promo .small {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* ===== Section Header ===== */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .view-options {
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    /* ===== Grid of apps ===== */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .card {
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+      border-color: var(--muted);
+    }
+
+    .card-top {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .app-icon {
+      min-width: 64px;
+      min-height: 64px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 20px;
+      color: white;
+    }
+
+    .card .meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .meta h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .meta p {
+      color: var(--text-secondary);
+      font-size: 13px;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    .card-info {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 2px;
+      background: var(--hover-bg);
+      color: var(--text-secondary);
+      text-transform: capitalize;
+    }
+
+    .rating {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+      color: var(--text-secondary);
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 4px 8px;
+      font-size: 16px;
+      transition: all 0.1s ease;
+    }
+
+    .icon-btn:hover {
+      color: var(--text-primary);
+      background: var(--hover-bg);
+      border-radius: 2px;
+    }
+
+    .card-actions .btn {
+      padding: 6px 16px;
+      font-size: 13px;
+    }
+
+    /* ===== Results text ===== */
+    .results {
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    /* ===== Modal ===== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 40px;
+    }
+
+    .modal {
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .modal .big-icon {
+      width: 96px;
+      height: 96px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .modal-title-section {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .modal h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .modal-subtitle {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+    }
+
+    .modal-info {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+      padding: 16px;
+      background: var(--bg);
+      border-radius: 4px;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .info-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .info-value {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .modal-section {
+      margin-bottom: 24px;
+    }
+
+    .modal-section h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .screenshots {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .screenshot {
+      height: 160px;
+      min-width: 280px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .modal.show {
+      animation: modalIn 0.2s ease-out;
+    }
+
+    @keyframes modalIn {
+      from {
+        transform: scale(0.95);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* ===== Scrollbar styling ===== */
+    ::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      border: 3px solid transparent;
+      background-clip: padding-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+      background-clip: padding-box;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width:980px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .search {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" aria-label="Navigation">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+              <rect x="1" y="1" width="10" height="10" />
+              <rect x="13" y="1" width="10" height="10" />
+              <rect x="1" y="13" width="10" height="10" />
+              <rect x="13" y="13" width="10" height="10" />
+            </svg>
+          </div>
+          <div>
+            <h1>Microsoft Store</h1>
+          </div>
+        </div>
+      </div>
+
+      <nav class="nav" role="navigation" aria-label="Main">
+        <button class="active" data-section="home">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Home
+        </button>
+        <button data-section="apps">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="3" width="7" height="7" stroke="currentColor" stroke-width="2" />
+            <rect x="14" y="3" width="7" height="7" stroke="currentColor" stroke-width="2" />
+            <rect x="14" y="14" width="7" height="7" stroke="currentColor" stroke-width="2" />
+            <rect x="3" y="14" width="7" height="7" stroke="currentColor" stroke-width="2" />
+          </svg>
+          Apps
+        </button>
+        <button data-section="games">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M6 12h4m2 0h4M8 8v8m8-8v8M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+          Games
+        </button>
+        <button data-section="entertainment">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M14.752 11.168l-3.197-2.132A1 1 0 0 0 10 9.87v4.263a1 1 0 0 0 1.555.832l3.197-2.132a1 1 0 0 0 0-1.664z"
+              fill="currentColor" />
+            <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" stroke="currentColor" stroke-width="2" />
+          </svg>
+          Entertainment
+        </button>
+        <button data-section="deals">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82zM7 7h.01"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          Deals
+        </button>
+      </nav>
+
+      <div class="filters">
+        <div class="filter-title">Categories</div>
+        <div>
+          <span class="chip active" data-filter="all">All</span>
+          <span class="chip" data-filter="productivity">Productivity</span>
+          <span class="chip" data-filter="games">Games</span>
+          <span class="chip" data-filter="education">Education</span>
+          <span class="chip" data-filter="entertainment">Entertainment</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main" role="main">
+      <div class="topbar">
+        <div class="search" role="search" aria-label="Search apps">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" />
+            <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+          <input id="q" placeholder="Search the Microsoft Store" />
+        </div>
+
+        <div class="actions">
+          <button class="btn" id="sortBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right:4px">
+              <path d="M3 6h18M7 12h10m-7 6h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            Sort
+          </button>
+        </div>
+      </div>
+
+      <div class="content">
+        <section class="hero" aria-label="Featured">
+          <div class="hero-card">
+            <div class="hero-meta">
+              <h2>Productivity essentials</h2>
+              <p>Get the best apps and tools to boost your workflow. Handpicked by our editors.</p>
+              <div class="hero-cta">
+                <button class="btn" id="exploreBtn">Explore collection</button>
+                <button class="btn" id="viewNew">What's new</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="promo">
+            <div class="big">Game Pass Ultimate</div>
+            <div class="small">Play hundreds of high-quality games</div>
+          </div>
+        </section>
+
+        <div class="section-header">
+          <div>
+            <div class="section-title">Top apps</div>
+            <div class="results" id="resultsTxt">Showing 0 apps</div>
+          </div>
+          <div class="view-options">
+            <button class="btn" style="padding:6px 12px">View all</button>
+          </div>
+        </div>
+
+        <section class="grid" id="grid" aria-live="polite" aria-label="App results">
+          <!-- app cards inserted here by JS -->
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-backdrop" id="backdrop" role="dialog" aria-hidden="true">
+    <div class="modal" id="modal" role="document" tabindex="-1">
+      <div class="modal-header">
+        <div class="big-icon" id="modalIcon">A</div>
+        <div class="modal-title-section">
+          <h2 id="appTitle">App title</h2>
+          <div class="modal-subtitle" id="appDesc">App description</div>
+          <div class="modal-actions">
+            <button class="btn primary" id="installBtn">Get</button>
+            <button class="btn" id="favBtn">
+              <span id="favIcon">♡</span> Add to wishlist
+            </button>
+            <button class="btn" id="shareBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right:4px">
+                <circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="2" />
+                <circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="2" />
+                <circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="2" />
+                <path d="M8.59 13.51l6.83 3.98m-.01-10.98l-6.82 3.98" stroke="currentColor" stroke-width="2" />
+              </svg>
+              Share
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-info">
+          <div class="info-item">
+            <div class="info-label">Rating</div>
+            <div class="info-value" id="modalRating">4.5 ★</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Version</div>
+            <div class="info-value" id="appVersion">1.0.0</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Size</div>
+            <div class="info-value" id="appSize">32MB</div>
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <h3>Screenshots</h3>
+          <div class="screenshots">
+            <div class="screenshot" style="background:linear-gradient(135deg,#0078d4,#50e6ff)"></div>
+            <div class="screenshot" style="background:linear-gradient(135deg,#8b5cf6,#06b6d4)"></div>
+            <div class="screenshot" style="background:linear-gradient(135deg,#f97316,#ef4444)"></div>
+            <div class="screenshot" style="background:linear-gradient(135deg,#22c55e,#14b8a6)"></div>
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <h3>Description</h3>
+          <p style="color:var(--text-secondary);line-height:1.6" id="modalDescFull">
+            This is a detailed description of the application. It provides powerful features and seamless integration
+            with your workflow.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ===== Sample app data ===== */
+    const APPS = [
+      { id: 1, name: 'NoteWave', desc: 'Beautiful note-taking with cloud sync and collaboration', tag: 'productivity', rating: 4.7, version: '2.3.1', size: '24MB', color: ['#0078d4', '#50e6ff'] },
+      { id: 2, name: 'Sketcher Pro', desc: 'Professional vector drawing and design tool', tag: 'productivity', rating: 4.5, version: '1.5.4', size: '56MB', color: ['#8b5cf6', '#06b6d4'] },
+      { id: 3, name: 'Epic Strategies', desc: 'Immersive turn-based strategy game', tag: 'games', rating: 4.8, version: '8.2.0', size: '1.2GB', color: ['#d946ef', '#7c3aed'] },
+      { id: 4, name: 'Codecademy', desc: 'Learn programming with interactive lessons', tag: 'education', rating: 4.3, version: '3.0.2', size: '42MB', color: ['#06b6d4', '#0ea5a4'] },
+      { id: 5, name: 'MoviePulse', desc: 'Stream and discover movies and TV shows', tag: 'entertainment', rating: 4.1, version: '2.8.9', size: '80MB', color: ['#f97316', '#ffb020'] },
+      { id: 6, name: 'Focus Timer', desc: 'Pomodoro productivity timer with statistics', tag: 'productivity', rating: 4.6, version: '1.2.0', size: '18MB', color: ['#22c55e', '#14b8a6'] },
+      { id: 7, name: 'Puzzle Grid', desc: 'Relaxing puzzle challenges for all ages', tag: 'games', rating: 4.2, version: '4.4.1', size: '120MB', color: ['#f97316', '#ef4444'] },
+      { id: 8, name: 'Language Pro', desc: 'Master 20+ languages with bite-sized lessons', tag: 'education', rating: 4.4, version: '5.6.2', size: '68MB', color: ['#06b6d4', '#6366f1'] },
+      { id: 9, name: 'Flow Music', desc: 'Curated ambient music for deep focus', tag: 'entertainment', rating: 4.5, version: '2.0.0', size: '42MB', color: ['#8b5cf6', '#7c3aed'] },
+      { id: 10, name: 'Budget Tracker', desc: 'Simple personal finance management', tag: 'productivity', rating: 4.0, version: '3.1.1', size: '38MB', color: ['#0ea5a4', '#06b6d4'] },
+      { id: 11, name: 'Photo Studio', desc: 'Professional photo editing made easy', tag: 'productivity', rating: 4.6, version: '4.2.0', size: '95MB', color: ['#ef4444', '#f97316'] },
+      { id: 12, name: 'Racing Thunder', desc: 'High-speed racing with stunning graphics', tag: 'games', rating: 4.7, version: '6.1.0', size: '2.1GB', color: ['#eab308', '#f97316'] },
+    ];
+
+    /* ===== Helpers ===== */
+    const $ = s => document.querySelector(s);
+    const $$ = s => Array.from(document.querySelectorAll(s));
+
+    const grid = $('#grid');
+    const qInput = $('#q');
+    const resultsTxt = $('#resultsTxt');
+    const backdrop = $('#backdrop');
+    const modal = $('#modal');
+    const modalIcon = $('#modalIcon');
+    const appTitle = $('#appTitle');
+    const appDesc = $('#appDesc');
+    const appVersion = $('#appVersion');
+    const appSize = $('#appSize');
+    const modalRating = $('#modalRating');
+    const modalDescFull = $('#modalDescFull');
+    const installBtn = $('#installBtn');
+    const favBtn = $('#favBtn');
+    const favIcon = $('#favIcon');
+    const shareBtn = $('#shareBtn');
+
+    let state = {
+      apps: APPS.slice(),
+      filter: 'all',
+      query: '',
+      favorites: new Set(),
+      sort: 'popular'
+    };
+
+    /* ===== Render functions ===== */
+    function renderApps() {
+      const q = state.query.trim().toLowerCase();
+      let apps = state.apps.filter(a => {
+        const matchFilter = state.filter === 'all' || a.tag === state.filter;
+        const matchQuery = !q || a.name.toLowerCase().includes(q) || a.desc.toLowerCase().includes(q);
+        return matchFilter && matchQuery;
+      });
+
+      apps.sort((a, b) => b.rating - a.rating);
+
+      grid.innerHTML = '';
+      apps.forEach(renderCard);
+      resultsTxt.textContent = `${apps.length} results`;
+    }
+
+    function renderCard(app) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.setAttribute('data-id', app.id);
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+
+      const top = document.createElement('div');
+      top.className = 'card-top';
+
+      const icon = document.createElement('div');
+      icon.className = 'app-icon';
+      icon.style.background = `linear-gradient(135deg, ${app.color[0]}, ${app.color[1]})`;
+      const initials = app.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+      icon.textContent = initials;
+
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+
+      const h3 = document.createElement('h3');
+      h3.textContent = app.name;
+
+      const p = document.createElement('p');
+      p.textContent = app.desc;
+
+      meta.appendChild(h3);
+      meta.appendChild(p);
+
+      top.appendChild(icon);
+      top.appendChild(meta);
+
+      const bottom = document.createElement('div');
+      bottom.className = 'card-bottom';
+
+      const info = document.createElement('div');
+      info.className = 'card-info';
+
+      const tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.textContent = app.tag;
+
+      const rating = document.createElement('div');
+      rating.className = 'rating';
+      rating.innerHTML = `<span style="color:#fbbf24">★</span> ${app.rating.toFixed(1)}`;
+
+      info.appendChild(tag);
+      info.appendChild(rating);
+
+      const actions = document.createElement('div');
+      actions.className = 'card-actions';
+
+      const favButton = document.createElement('button');
+      favButton.className = 'icon-btn';
+      favButton.title = 'Add to wishlist';
+      favButton.innerHTML = state.favorites.has(app.id) ? '❤' : '♡';
+      favButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleFav(app.id);
+        favButton.innerHTML = state.favorites.has(app.id) ? '❤' : '♡';
+      });
+
+      const getBtn = document.createElement('button');
+      getBtn.className = 'btn primary';
+      getBtn.textContent = 'Get';
+      getBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fakeInstall(app);
+      });
+
+      actions.appendChild(favButton);
+      actions.appendChild(getBtn);
+
+      bottom.appendChild(info);
+      bottom.appendChild(actions);
+
+      card.appendChild(top);
+      card.appendChild(bottom);
+
+      card.addEventListener('click', () => openModal(app));
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openModal(app);
+        }
+      });
+
+      grid.appendChild(card);
+    }
+
+    /* ===== UI actions ===== */
+    function toggleFav(id) {
+      if (state.favorites.has(id)) state.favorites.delete(id);
+      else state.favorites.add(id);
+    }
+
+    function fakeInstall(app) {
+      const temp = document.createElement('div');
+      temp.style.cssText = 'position:fixed;top:20px;right:20px;background:#0078d4;color:white;padding:12px 20px;border-radius:4px;z-index:2000;animation:slideIn 0.3s ease';
+      temp.textContent = `Installing ${app.name}...`;
+      document.body.appendChild(temp);
+      setTimeout(() => {
+        temp.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => temp.remove(), 300);
+      }, 2000);
+    }
+
+    function openModal(app) {
+      modalIcon.style.background = `linear-gradient(135deg, ${app.color[0]}, ${app.color[1]})`;
+      modalIcon.textContent = app.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+      appTitle.textContent = app.name;
+      appDesc.textContent = app.desc;
+      appVersion.textContent = app.version;
+      appSize.textContent = app.size;
+      modalRating.innerHTML = `${app.rating.toFixed(1)} <span style="color:#fbbf24">★</span>`;
+      modalDescFull.textContent = app.desc + ' This application offers seamless integration with Windows and provides a modern, intuitive interface designed for productivity and ease of use.';
+
+      installBtn.onclick = () => fakeInstall(app);
+      favBtn.onclick = () => {
+        toggleFav(app.id);
+        favIcon.textContent = state.favorites.has(app.id) ? '❤' : '♡';
+        favBtn.innerHTML = `${favIcon.textContent} ${state.favorites.has(app.id) ? 'In wishlist' : 'Add to wishlist'}`;
+      };
+      favIcon.textContent = state.favorites.has(app.id) ? '❤' : '♡';
+      favBtn.innerHTML = `<span id="favIcon">${favIcon.textContent}</span> ${state.favorites.has(app.id) ? 'In wishlist' : 'Add to wishlist'}`;
+
+      shareBtn.onclick = () => {
+        const temp = document.createElement('div');
+        temp.style.cssText = 'position:fixed;top:20px;right:20px;background:#2b2b2b;border:1px solid #3a3a3a;color:white;padding:12px 20px;border-radius:4px;z-index:2000';
+        temp.textContent = 'Link copied to clipboard!';
+        document.body.appendChild(temp);
+        setTimeout(() => temp.remove(), 2000);
+      };
+
+      backdrop.style.display = 'flex';
+      backdrop.setAttribute('aria-hidden', 'false');
+      modal.classList.add('show');
+      setTimeout(() => modal.focus(), 100);
+    }
+
+    function closeModalFunc() {
+      backdrop.style.display = 'none';
+      backdrop.setAttribute('aria-hidden', 'true');
+      modal.classList.remove('show');
+    }
+
+    /* ===== Input bindings ===== */
+    qInput.addEventListener('input', e => {
+      state.query = e.target.value;
+      renderApps();
+    });
+
+    $('.chip').forEach(ch => {
+      ch.addEventListener('click', () => {
+        $('.chip').forEach(c => c.classList.remove('active'));
+        ch.classList.add('active');
+        const filter = ch.getAttribute('data-filter') || 'all';
+        state.filter = filter;
+        renderApps();
+      });
+    });
+
+    $('.nav button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        $('.nav button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const sec = btn.getAttribute('data-section');
+        if (sec === 'games') {
+          state.filter = 'games';
+          activateChip('games');
+        } else if (sec === 'apps') {
+          state.filter = 'productivity';
+          activateChip('productivity');
+        } else if (sec === 'entertainment') {
+          state.filter = 'entertainment';
+          activateChip('entertainment');
+        } else {
+          state.filter = 'all';
+          activateChip('all');
+        }
+        renderApps();
+      });
+    });
+
+    function activateChip(name) {
+      $('.chip').forEach(c => c.classList.toggle('active', (c.getAttribute('data-filter') || '') === name));
+    }
+
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) closeModalFunc();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && backdrop.style.display === 'flex') {
+        closeModalFunc();
+      }
+    });
+
+    $('#exploreBtn').addEventListener('click', () => {
+      state.filter = 'productivity';
+      activateChip('productivity');
+      renderApps();
+      window.scrollTo({ top: 400, behavior: 'smooth' });
+    });
+
+    $('#sortBtn').addEventListener('click', () => {
+      const temp = document.createElement('div');
+      temp.style.cssText = 'position:fixed;top:60px;right:24px;background:#2b2b2b;border:1px solid #3a3a3a;color:white;padding:12px;border-radius:4px;z-index:100;min-width:150px';
+      temp.innerHTML = '<div style="padding:8px;cursor:pointer;border-radius:2px" onmouseover="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseout="this.style.background=\'transparent\'">Popular</div><div style="padding:8px;cursor:pointer;border-radius:2px" onmouseover="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseout="this.style.background=\'transparent\'">Highest rated</div><div style="padding:8px;cursor:pointer;border-radius:2px" onmouseover="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseout="this.style.background=\'transparent\'">Name</div>';
+      document.body.appendChild(temp);
+      setTimeout(() => temp.remove(), 3000);
+    });
+
+    // Add animations
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    renderApps();
+  </script>
+</body>
+
+</html>
