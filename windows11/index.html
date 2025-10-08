@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -104,7 +105,7 @@
             backdrop-filter: blur(30px) saturate(150%);
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: start;
             z-index: 1000;
             border-top: 1px solid var(--border);
         }
@@ -189,8 +190,7 @@
         .start-menu {
             position: fixed;
             bottom: calc(var(--taskbar-height) + 8px);
-            left: 50%;
-            transform: translateX(-50%) scale(0.95);
+            left: calc((600px/2) + 10px);
             width: 600px;
             height: 680px;
             background: var(--bg-acrylic);
@@ -198,18 +198,31 @@
             border-radius: var(--radius-lg);
             border: 1px solid var(--border);
             box-shadow: var(--shadow-lg);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             display: flex;
             flex-direction: column;
             overflow: hidden;
+
+            /* Start hidden and slightly lower */
+            opacity: 0;
+            visibility: hidden;
+            transform: translate(-50%, 30px) scale(0.96);
+            transform-origin: bottom center;
+
+            /* Smooth Windows-like easing */
+            transition:
+                opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0s linear 0.25s;
         }
 
         .start-menu.open {
             opacity: 1;
             visibility: visible;
-            transform: translateX(-50%) scale(1);
+            transform: translate(-50%, 0) scale(1);
+            transition:
+                opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0s linear 0s;
         }
 
         .start-search {
@@ -569,6 +582,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Desktop -->
     <div class="desktop">
@@ -585,9 +599,6 @@
             <div class="icon-label">Documents</div>
         </div>
     </div>
-
-    <!-- Overlay -->
-    <div class="overlay" id="overlay"></div>
 
     <!-- Start Menu -->
     <div class="start-menu" id="startMenu">
@@ -780,51 +791,55 @@
         const startMenu = document.getElementById('startMenu');
         const quickSettingsBtn = document.getElementById('quickSettingsBtn');
         const quickSettings = document.getElementById('quickSettings');
-        const overlay = document.getElementById('overlay');
 
         let activePanel = null;
 
         function closeAll() {
-            startMenu.classList.remove('open');
-            quickSettings.classList.remove('open');
-            overlay.classList.remove('active');
+            startMenu.classList.remove("open");
+            quickSettings.classList.remove("open");
             activePanel = null;
         }
 
-        startBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (activePanel === 'start') {
+        // --- outside click handler (one global listener only)
+        document.addEventListener("click", (e) => {
+            if (activePanel === "start" && !startMenu.contains(e.target) && e.target !== startBtn) {
                 closeAll();
-            } else {
+            }
+            if (activePanel === "settings" && !quickSettings.contains(e.target) && e.target !== quickSettingsBtn) {
                 closeAll();
-                startMenu.classList.add('open');
-                overlay.classList.add('active');
-                activePanel = 'start';
             }
         });
 
-        quickSettingsBtn.addEventListener('click', (e) => {
+        // --- start button
+        startBtn.addEventListener("click", (e) => {
             e.stopPropagation();
-            if (activePanel === 'settings') {
+            if (activePanel === "start") {
                 closeAll();
             } else {
                 closeAll();
-                quickSettings.classList.add('open');
-                overlay.classList.add('active');
-                activePanel = 'settings';
+                startMenu.classList.add("open");
+                activePanel = "start";
             }
         });
 
-        overlay.addEventListener('click', closeAll);
+        // --- quick settings button
+        quickSettingsBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (activePanel === "settings") {
+                closeAll();
+            } else {
+                closeAll();
+                quickSettings.classList.add("open");
+                activePanel = "settings";
+            }
+        });
 
-        // Quick toggle interactions
         document.querySelectorAll('.quick-toggle').forEach(toggle => {
             toggle.addEventListener('click', () => {
                 toggle.classList.toggle('active');
             });
         });
 
-        // Update time
         function updateTime() {
             const now = new Date();
             const time = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
@@ -845,4 +860,5 @@
         });
     </script>
 </body>
+
 </html>
