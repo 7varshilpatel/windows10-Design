@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Windows Desktop Component – Enhanced Demo</title>
+</head>
+
+<body>
+    <div id="app" style="height:100vh;"></div>
+
+    <script type="module">
+        /**
+         * Theme Manager - Handles light/dark mode switching
+         */
+        class ThemeManager {
+            constructor() {
+                this.theme = 'dark';
+                this.listeners = new Set();
+            }
+
+            setTheme(theme) {
+                this.theme = theme;
+                document.documentElement.setAttribute('data-theme', theme);
+                this.listeners.forEach(fn => fn(theme));
+            }
+
+            toggle() {
+                this.setTheme(this.theme === 'dark' ? 'light' : 'dark');
+            }
+
+            subscribe(callback) {
+                this.listeners.add(callback);
+                return () => this.listeners.delete(callback);
+            }
+
+            getCurrentTheme() {
+                return this.theme;
+            }
+        }
+
+        /**
+         * DesktopIcon - Individual icon component
+         */
+        class DesktopIcon {
+            constructor(iconData, callbacks = {}) {
+                this.data = iconData;
+                this.callbacks = callbacks;
+                this.element = this._createElement();
+            }
+
+            _createElement() {
+                const el = document.createElement('div');
+                el.className = 'desktop-icon';
+                el.dataset.iconId = this.data.id ?? `icon-${Math.random().toString(36).slice(2)}`;
+                el.innerHTML = `
+                    <div class="icon-image" aria-hidden="true">${this.data.icon ?? '📄'}</div>
+                    <div class="icon-label">${this.data.name ?? 'Unnamed'}</div>
+                `;
+
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.callbacks.onSelect?.(this);
+                });
+
+                el.addEventListener('dblclick', (e) => {
+                    e.stopPropagation();
+                    this.callbacks.onOpen?.(this);
+                });
+
+                el.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.callbacks.onContextMenu?.(this, e);
+                });
+
+                return el;
+            }
+
+            select() {
+                this.element.classList.add('selected');
+            }
+
+            deselect() {
+                this.element.classList.remove('selected');
+            }
+
+            remove() {
+                this.element.remove();
+            }
+
+            rename(newName) {
+                this.data.name = newName;
+                const label = this.element.querySelector('.icon-label');
+                if (label) label.textContent = newName;
+            }
+
+            getElement() {
+                return this.element;
+            }
+        }
+
+        /**
+         * ContextMenu - Reusable context menu component
+         */
+        class ContextMenu {
+            constructor(menuId, items, callbacks = {}) {
+                this.menuId = menuId;
+                this.items = items;
+                this.callbacks = callbacks;
+                this.element = this._createElement();
+                this.currentSubmenu = null;
+                this.submenuTimeout = null;
+            }
+
+            _createElement() {
+                const menu = document.createElement('div');
+                menu.className = 'wd-menu';
+                menu.id = this.menuId;
+                menu.setAttribute('role', 'menu');
+                menu.setAttribute('aria-hidden', 'true');
+
+                this.items.forEach(item => {
+                    if (item.separator) {
+                        const sep = document.createElement('div');
+                        sep.className = 'wd-menu-sep';
+                        menu.appendChild(sep);
+                    } else {
+                        const menuItem = document.createElement('div');
+                        menuItem.className = 'wd-menu-item';
+                        if (item.submenu) {
+                            menuItem.classList.add('has-submenu');
+                            menuItem.dataset.submenu = item.submenu;
+                        }
+                        if (item.action) {
+                            menuItem.dataset.action = item.action;
+                        }
+
+                        let html = item.icon ? `${item.icon} ` : '';
+                        html += `<span class="wd-text">${item.label}</span>`;
+                        if (item.submenu) {
+                            html += ' <span class="wd-arrow">▶</span>';
+                        }
+                        if (item.shortcut) {
+                            html += ` <span class="wd-shortcut">${item.shortcut}</span>`;
+                        }
+
+                        menuItem.innerHTML = html;
+                        menu.appendChild(menuItem);
+
+                        // Attach click handler
+                        if (item.action) {
+                            menuItem.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                this.callbacks.onAction?.(item.action);
+                                this.hide();
+                            });
+                        }
+
+                        // Submenu hover
+                        if (item.submenu) {
+                            menuItem.addEventListener('mouseenter', () => {
+                                this._showSubmenu(item.submenu, menuItem);
+                            });
+                        }
+                    }
+                });
+
+                menu.addEventListener('contextmenu', e => e.preventDefault());
+                return menu;
+            }
+
+            show(x, y) {
+                this.element.style.left = x + 'px';
+                this.element.style.top = y + 'px';
+                this.element.classList.add('show');
+
+                requestAnimationFrame(() => {
+                    const rect = this.element.getBoundingClientRect();
+                    const vw = window.innerWidth;
+                    const vh = window.innerHeight;
+                    if (rect.right > vw) this.element.style.left = Math.max(6, vw - rect.width - 6) + 'px';
+                    if (rect.bottom > vh) this.element.style.top = Math.max(6, vh - rect.height - 6) + 'px';
+                });
+            }
+
+            hide() {
+                this.element.classList.remove('show');
+                if (this.currentSubmenu) {
+                    this.currentSubmenu.hide();
+                    this.currentSubmenu = null;
+                }
+                if (this.submenuTimeout) {
+                    clearTimeout(this.submenuTimeout);
+                    this.submenuTimeout = null;
+                }
+            }
+
+            _showSubmenu(submenuId, parentItem) {
+                if (this.submenuTimeout) clearTimeout(this.submenuTimeout);
+
+                this.submenuTimeout = setTimeout(() => {
+                    if (this.currentSubmenu && this.currentSubmenu.menuId !== submenuId) {
+                        this.currentSubmenu.hide();
+                    }
+
+                    this.currentSubmenu = this.callbacks.getSubmenu?.(submenuId);
+                    if (this.currentSubmenu) {
+                        const rect = parentItem.getBoundingClientRect();
+                        const menuRect = this.element.getBoundingClientRect();
+                        this.currentSubmenu.show(menuRect.right - 6, rect.top);
+                    }
+                }, 180);
+            }
+
+            getElement() {
+                return this.element;
+            }
+        }
+
+        /**
+         * WindowsDesktop - Main desktop component
+         */
+        class WindowsDesktop {
+            constructor(container, options = {}) {
+                if (!container || !(container instanceof HTMLElement)) {
+                    throw new Error('WindowsDesktop: container must be a DOM element');
+                }
+
+                this.container = container;
+                this.themeManager = new ThemeManager();
+                this.icons = new Map();
+                this.selectedIcon = null;
+                this.menus = new Map();
+
+                this.options = Object.assign({
+                    initialIcons: [
+                        { id: 'this-pc', name: 'This PC', icon: '💻' },
+                        { id: 'recycle-bin', name: 'Recycle Bin', icon: '🗑️' },
+                        { id: 'documents', name: 'Documents', icon: '📁' },
+                        { id: 'network', name: 'Network', icon: '🌐' }
+                    ]
+                }, options);
+
+                this._injectStyles();
+                this._buildDOM();
+                this._createMenus();
+                this._attachEvents();
+
+                // Add initial icons
+                this.options.initialIcons.forEach(ic => this.addIcon(ic));
+
+                // Set initial theme
+                this.themeManager.setTheme('dark');
+            }
+
+            _injectStyles() {
+                if (document.getElementById('wd-styles')) return;
+
+                const style = document.createElement('style');
+                style.id = 'wd-styles';
+                style.textContent = `
+:root {
+    --wd-font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Segoe UI Variable Display', sans-serif;
+    --wd-font-weight: 400;
+    --wd-font-weight-semibold: 600;
+}
+
+[data-theme="dark"] {
+    --wd-bg-desktop: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e3a8a 100%);
+    --wd-bg-menu: #2b2b2b;
+    --wd-bg-menu-hover: #3d3d3d;
+    --wd-text: #ffffff;
+    --wd-text-secondary: #cccccc;
+    --wd-disabled: #6b6b6b;
+    --wd-accent: #0078d4;
+    --wd-border: #3d3d3d;
+    --wd-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    --wd-icon-bg-hover: rgba(255,255,255,0.06);
+    --wd-icon-bg-selected: rgba(120,180,240,0.22);
+    --wd-icon-border-selected: rgba(120,180,240,0.35);
+}
+
+[data-theme="light"] {
+    --wd-bg-desktop: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
+    --wd-bg-menu: #f3f3f3;
+    --wd-bg-menu-hover: #e5e5e5;
+    --wd-text: #000000;
+    --wd-text-secondary: #5c5c5c;
+    --wd-disabled: #a3a3a3;
+    --wd-accent: #0067c0;
+    --wd-border: #d1d1d1;
+    --wd-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    --wd-icon-bg-hover: rgba(0,0,0,0.04);
+    --wd-icon-bg-selected: rgba(0,103,192,0.12);
+    --wd-icon-border-selected: rgba(0,103,192,0.25);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.wd-root {
+    height: 100%;
+    width: 100%;
+    font-family: var(--wd-font-family);
+    font-weight: var(--wd-font-weight);
+    color: var(--wd-text);
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    background: var(--wd-bg-desktop);
+    display: flex;
+    flex-direction: column;
+}
+
+.wd-desktop {
+    flex: 1;
+    padding: 18px;
+    height: 100%;
+    outline: none;
+    display: flex;
+    overflow: auto;
+}
+
+.wd-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 80px);
+    grid-auto-rows: 90px;
+    gap: 10px;
+    align-content: start;
+    width: 100%;
+}
+
+.desktop-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.12s ease;
+    width: 80px;
+    height: 90px;
+    border: 1px solid transparent;
+}
+
+.desktop-icon:hover {
+    background: var(--wd-icon-bg-hover);
+}
+
+.desktop-icon.selected {
+    background: var(--wd-icon-bg-selected);
+    border-color: var(--wd-icon-border-selected);
+}
+
+.icon-image {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.35));
+}
+
+.icon-label {
+    font-size: 11px;
+    text-align: center;
+    line-height: 1.2;
+    max-width: 70px;
+    word-break: break-word;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+
+[data-theme="light"] .icon-label {
+    text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+}
+
+.wd-menu {
+    position: fixed;
+    min-width: 200px;
+    background: var(--wd-bg-menu);
+    border: 1px solid var(--wd-border);
+    box-shadow: var(--wd-shadow);
+    padding: 6px 4px;
+    z-index: 10000;
+    display: none;
+    font-size: 13px;
+    border-radius: 8px;
+}
+
+.wd-menu.show {
+    display: block;
+}
+
+.wd-menu-item {
+    display: flex;
+    align-items: center;
+    height: 30px;
+    padding: 4px 12px;
+    gap: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    color: var(--wd-text);
+    font-weight: var(--wd-font-weight);
+}
+
+.wd-menu-item:hover {
+    background: var(--wd-bg-menu-hover);
+}
+
+.wd-menu-item .wd-text {
+    flex: 1;
+}
+
+.wd-menu-item .wd-arrow {
+    color: var(--wd-text-secondary);
+    margin-left: 8px;
+    font-size: 12px;
+}
+
+.wd-menu-item .wd-shortcut {
+    color: var(--wd-text-secondary);
+    font-size: 11px;
+    margin-left: auto;
+}
+
+.wd-menu-sep {
+    height: 1px;
+    margin: 6px 4px;
+    background: var(--wd-border);
+    border-radius: 2px;
+}
+
+.wd-toolbar {
+    background: var(--wd-bg-menu);
+    border-bottom: 1px solid var(--wd-border);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.wd-toolbar-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 6px 12px;
+    color: var(--wd-text);
+    font-family: var(--wd-font-family);
+    font-size: 12px;
+    font-weight: var(--wd-font-weight);
+    cursor: pointer;
+    transition: all 0.12s ease;
+}
+
+.wd-toolbar-btn:hover {
+    background: var(--wd-bg-menu-hover);
+    border-color: var(--wd-border);
+}
+
+@media (max-width: 480px) {
+    .wd-grid {
+        grid-template-columns: repeat(auto-fill, 64px);
+        gap: 8px;
+    }
+    .desktop-icon {
+        width: 64px;
+        height: 80px;
+    }
+    .icon-image {
+        width: 40px;
+        height: 40px;
+        font-size: 26px;
+    }
+    .wd-menu {
+        min-width: 160px;
+        font-size: 12px;
+    }
+}
+`;
+                document.head.appendChild(style);
+            }
+
+            _buildDOM() {
+                this.root = document.createElement('div');
+                this.root.className = 'wd-root';
+                this.root.innerHTML = `
+                    <div class="wd-toolbar">
+                        <button class="wd-toolbar-btn" id="theme-toggle">Toggle Theme</button>
+                    </div>
+                    <div class="wd-desktop" tabindex="0">
+                        <div class="wd-grid" id="wd-grid"></div>
+                    </div>
+                `;
+
+                this.container.innerHTML = '';
+                this.container.appendChild(this.root);
+
+                this.desktop = this.root.querySelector('.wd-desktop');
+                this.desktopGrid = this.root.querySelector('#wd-grid');
+                this.themeToggleBtn = this.root.querySelector('#theme-toggle');
+            }
+
+            _createMenus() {
+                // Desktop context menu
+                const desktopMenuItems = [
+                    { icon: '↕️', label: 'Sort by', submenu: 'sort' },
+                    { icon: '🔄', label: 'Refresh', action: 'refresh' },
+                    { separator: true },
+                    { icon: '📄', label: 'New', submenu: 'new' },
+                    { separator: true },
+                    { icon: '⚙️', label: 'Display settings', action: 'display' },
+                    { icon: '🎨', label: 'Personalize', action: 'personalize' }
+                ];
+
+                const desktopMenu = new ContextMenu('wd-desktop-menu', desktopMenuItems, {
+                    onAction: (action) => this._handleAction(action),
+                    getSubmenu: (id) => this.menus.get(id)
+                });
+
+                // Icon context menu
+                const iconMenuItems = [
+                    { icon: '📂', label: 'Open', action: 'open' },
+                    { separator: true },
+                    { icon: '✂️', label: 'Cut', action: 'cut', shortcut: 'Ctrl+X' },
+                    { icon: '📋', label: 'Copy', action: 'copy', shortcut: 'Ctrl+C' },
+                    { separator: true },
+                    { icon: '🔗', label: 'Create shortcut', action: 'create-shortcut' },
+                    { icon: '🗑️', label: 'Delete', action: 'delete', shortcut: 'Del' },
+                    { icon: '✏️', label: 'Rename', action: 'rename', shortcut: 'F2' },
+                    { separator: true },
+                    { icon: 'ℹ️', label: 'Properties', action: 'properties', shortcut: 'Alt+Enter' }
+                ];
+
+                const iconMenu = new ContextMenu('wd-icon-menu', iconMenuItems, {
+                    onAction: (action) => this._handleAction(action, this.selectedIcon),
+                    getSubmenu: (id) => this.menus.get(id)
+                });
+
+                // Sort submenu
+                const sortItems = [
+                    { icon: '✓', label: 'Name', action: 'sort-name' },
+                    { label: 'Size', action: 'sort-size' },
+                    { label: 'Item type', action: 'sort-type' },
+                    { label: 'Date modified', action: 'sort-date' }
+                ];
+
+                const sortSubmenu = new ContextMenu('wd-sort-submenu', sortItems, {
+                    onAction: (action) => this._handleAction(action)
+                });
+
+                // New submenu
+                const newItems = [
+                    { icon: '📁', label: 'Folder', action: 'new-folder' },
+                    { icon: '📄', label: 'Text Document', action: 'new-text' },
+                    { icon: '📊', label: 'Microsoft Excel Worksheet', action: 'new-excel' },
+                    { icon: '📝', label: 'Microsoft Word Document', action: 'new-word' }
+                ];
+
+                const newSubmenu = new ContextMenu('wd-new-submenu', newItems, {
+                    onAction: (action) => this._handleAction(action)
+                });
+
+                // Store menus
+                this.menus.set('desktop', desktopMenu);
+                this.menus.set('icon', iconMenu);
+                this.menus.set('sort', sortSubmenu);
+                this.menus.set('new', newSubmenu);
+
+                // Append menu elements to root
+                [desktopMenu, iconMenu, sortSubmenu, newSubmenu].forEach(menu => {
+                    this.root.appendChild(menu.getElement());
+                });
+            }
+
+            _attachEvents() {
+                // Desktop right-click
+                this.desktop.addEventListener('contextmenu', (e) => {
+                    if (e.target.closest('.desktop-icon')) return;
+                    e.preventDefault();
+                    this._hideAllMenus();
+                    this.menus.get('desktop').show(e.clientX, e.clientY);
+                });
+
+                // Desktop click
+                this.desktop.addEventListener('click', (e) => {
+                    if (e.target.closest('.desktop-icon')) return;
+                    this._hideAllMenus();
+                    this._clearSelection();
+                });
+
+                // Theme toggle
+                this.themeToggleBtn.addEventListener('click', () => {
+                    this.themeManager.toggle();
+                });
+
+                // Document-wide click
+                this._boundDocClick = (e) => {
+                    if (e.target.closest('.wd-menu')) return;
+                    this._hideAllMenus();
+                };
+                document.addEventListener('click', this._boundDocClick);
+
+                // ESC key
+                this._boundKeydown = (e) => {
+                    if (e.key === 'Escape') this._hideAllMenus();
+                };
+                document.addEventListener('keydown', this._boundKeydown);
+            }
+
+            addIcon(iconData) {
+                const icon = new DesktopIcon(iconData, {
+                    onSelect: (icon) => this._selectIcon(icon),
+                    onOpen: (icon) => this._handleAction('open', icon),
+                    onContextMenu: (icon, e) => {
+                        this._selectIcon(icon);
+                        this._hideAllMenus();
+                        this.menus.get('icon').show(e.clientX, e.clientY);
+                    }
+                });
+
+                this.icons.set(icon.data.id, icon);
+                this.desktopGrid.appendChild(icon.getElement());
+                return icon;
+            }
+
+            removeIcon(iconId) {
+                const icon = this.icons.get(iconId);
+                if (icon) {
+                    icon.remove();
+                    this.icons.delete(iconId);
+                    if (this.selectedIcon === icon) {
+                        this.selectedIcon = null;
+                    }
+                }
+            }
+
+            _selectIcon(icon) {
+                if (this.selectedIcon) {
+                    this.selectedIcon.deselect();
+                }
+                icon.select();
+                this.selectedIcon = icon;
+            }
+
+            _clearSelection() {
+                if (this.selectedIcon) {
+                    this.selectedIcon.deselect();
+                    this.selectedIcon = null;
+                }
+            }
+
+            _hideAllMenus() {
+                this.menus.forEach(menu => menu.hide());
+            }
+
+            _handleAction(action, icon = null) {
+                console.log('Action:', action, 'Icon:', icon?.data?.id);
+
+                switch (action) {
+                    case 'open':
+                        if (icon) {
+                            alert(`Opening "${icon.data.name}"`);
+                        }
+                        break;
+
+                    case 'delete':
+                        if (icon && confirm(`Delete "${icon.data.name}"?`)) {
+                            this.removeIcon(icon.data.id);
+                        }
+                        break;
+
+                    case 'rename':
+                        if (icon) {
+                            const newName = prompt('Rename item', icon.data.name);
+                            if (newName !== null && newName.trim()) {
+                                icon.rename(newName.trim());
+                            }
+                        }
+                        break;
+
+                    case 'properties':
+                        if (icon) {
+                            alert(`Properties\nID: ${icon.data.id}\nName: ${icon.data.name}`);
+                        }
+                        break;
+
+                    case 'refresh':
+                        this.container.style.filter = 'brightness(0.96)';
+                        setTimeout(() => (this.container.style.filter = ''), 120);
+                        break;
+
+                    case 'new-folder':
+                        const id = 'folder-' + Date.now();
+                        const newIcon = this.addIcon({
+                            id,
+                            name: 'New Folder',
+                            icon: '📁'
+                        });
+                        setTimeout(() => {
+                            newIcon.getElement().scrollIntoView({ block: 'nearest' });
+                            this._selectIcon(newIcon);
+                        }, 10);
+                        break;
+
+                    default:
+                        console.log(`Action "${action}" not implemented`);
+                }
+            }
+
+            destroy() {
+                document.removeEventListener('click', this._boundDocClick);
+                document.removeEventListener('keydown', this._boundKeydown);
+                this.container.innerHTML = '';
+            }
+        }
+
+        // Initialize demo
+        const mount = document.getElementById('app');
+        const desktop = new WindowsDesktop(mount);
+
+        // Expose for debugging
+        window.WindowsDesktop = WindowsDesktop;
+        window.desktopInstance = desktop;
+    </script>
+</body>
+
+</html>

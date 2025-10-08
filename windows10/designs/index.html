@@ -1,26 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Windows 10 Desktop Interface</title>
     <style>
         :root {
-            /* Windows 10 Design System */
             --taskbar-height: 40px;
             --bg-desktop: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e3a8a 100%);
-            --bg-menu: #2b2b2b;
-            --bg-menu-hover: #3d3d3d;
-            --bg-menu-disabled: #252525;
+            --bg-menu: rgba(31, 31, 31, 0.95);
+            --bg-menu-hover: rgba(255, 255, 255, 0.1);
+            --bg-panel: rgba(31, 31, 31, 0.95);
             --text-primary: #ffffff;
-            --text-secondary: #cccccc;
+            --text-secondary: #b3b3b3;
             --text-disabled: #6b6b6b;
             --accent: #0078d4;
             --accent-hover: #1984d8;
-            --accent-pressed: #005a9e;
-            --border: #3d3d3d;
-            --separator: #4d4d4d;
-            --shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            --border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
 
         * {
@@ -30,7 +28,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-desktop);
             color: var(--text-primary);
             overflow: hidden;
@@ -97,6 +95,7 @@
             right: 0;
             height: var(--taskbar-height);
             background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
             display: flex;
             align-items: center;
             z-index: 1000;
@@ -221,6 +220,7 @@
         .context-menu {
             position: fixed;
             background: var(--bg-menu);
+            backdrop-filter: blur(20px);
             border: 1px solid var(--border);
             box-shadow: var(--shadow);
             min-width: 200px;
@@ -237,11 +237,11 @@
         .menu-item {
             display: flex;
             align-items: center;
-            padding: 4px 24px 4px 26px;
+            padding: 8px 32px 8px 32px;
             cursor: default;
             position: relative;
             color: var(--text-primary);
-            height: 26px;
+            height: 32px;
         }
 
         .menu-item:hover:not(.disabled):not(.separator) {
@@ -256,18 +256,14 @@
         .menu-item.separator {
             height: 1px;
             padding: 0;
-            margin: 2px 0;
-            background: var(--separator);
+            margin: 4px 0;
+            background: var(--border);
             cursor: default;
-        }
-
-        .menu-item.separator:hover {
-            background: var(--separator);
         }
 
         .menu-icon {
             position: absolute;
-            left: 4px;
+            left: 8px;
             width: 18px;
             text-align: center;
             font-size: 14px;
@@ -285,30 +281,9 @@
 
         .menu-arrow {
             position: absolute;
-            right: 6px;
+            right: 8px;
             font-size: 10px;
             color: var(--text-secondary);
-        }
-
-        .menu-item.has-submenu:hover .menu-arrow {
-            color: var(--text-primary);
-        }
-
-        /* Submenu */
-        .submenu {
-            position: fixed;
-            background: var(--bg-menu);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            min-width: 180px;
-            padding: 2px 0;
-            z-index: 10001;
-            display: none;
-            font-size: 12px;
-        }
-
-        .submenu.show {
-            display: block;
         }
 
         /* Start Menu */
@@ -316,12 +291,14 @@
             position: fixed;
             bottom: var(--taskbar-height);
             left: 0;
-            width: 520px;
-            height: 520px;
+            width: 640px;
+            height: 600px;
             background: var(--bg-menu);
+            backdrop-filter: blur(40px);
             border: 1px solid var(--border);
             box-shadow: var(--shadow);
             display: none;
+            flex-direction: column;
             z-index: 2000;
         }
 
@@ -329,17 +306,158 @@
             display: flex;
         }
 
-        .start-sidebar {
-            width: 48px;
-            background: #1a1a1a;
+        .start-header {
+            padding: 48px 48px 24px 48px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .start-header h2 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .start-body {
             display: flex;
-            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .start-apps {
+            flex: 1;
+            padding: 24px 48px;
+            overflow-y: auto;
+        }
+
+        .app-group {
+            margin-bottom: 24px;
+        }
+
+        .app-group-title {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .app-list-item {
+            display: flex;
             align-items: center;
-            padding: 12px 0;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: background 0.1s ease;
+            gap: 12px;
+        }
+
+        .app-list-item:hover {
+            background: var(--bg-menu-hover);
+        }
+
+        .app-list-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .app-list-name {
+            font-size: 14px;
+        }
+
+        .start-tiles {
+            width: 380px;
+            padding: 24px;
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 1px solid var(--border);
+            overflow-y: auto;
+        }
+
+        .tiles-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 8px;
         }
 
-        .start-sidebar-icon {
+        .tile {
+            aspect-ratio: 1.5;
+            background: var(--accent);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-end;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            padding: 12px;
+            border-radius: 2px;
+        }
+
+        .tile:hover {
+            transform: scale(1.02);
+            filter: brightness(1.1);
+        }
+
+        .tile-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .tile-name {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .start-footer {
+            display: flex;
+            align-items: center;
+            padding: 0 48px;
+            height: 56px;
+            border-top: 1px solid var(--border);
+            gap: 16px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: background 0.1s ease;
+        }
+
+        .user-profile:hover {
+            background: var(--bg-menu-hover);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .start-footer-icons {
+            margin-left: auto;
+            display: flex;
+            gap: 4px;
+        }
+
+        .footer-icon {
             width: 40px;
             height: 40px;
             display: flex;
@@ -351,103 +469,229 @@
             font-size: 18px;
         }
 
-        .start-sidebar-icon:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .start-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .start-apps {
-            flex: 1;
-            padding: 16px;
-            overflow-y: auto;
-        }
-
-        .app-group {
-            margin-bottom: 20px;
-        }
-
-        .app-group-title {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .app-list-item {
-            display: flex;
-            align-items: center;
-            padding: 6px 8px;
-            cursor: pointer;
-            border-radius: 2px;
-            transition: background 0.1s ease;
-            gap: 10px;
-        }
-
-        .app-list-item:hover {
+        .footer-icon:hover {
             background: var(--bg-menu-hover);
         }
 
-        .app-list-icon {
-            width: 24px;
-            height: 24px;
+        /* Notification Panel */
+        .notification-panel {
+            position: fixed;
+            bottom: var(--taskbar-height);
+            right: 0;
+            width: 400px;
+            height: 600px;
+            background: var(--bg-panel);
+            backdrop-filter: blur(40px);
+            border: 1px solid var(--border);
+            border-right: none;
+            border-bottom: none;
+            box-shadow: var(--shadow);
+            display: none;
+            flex-direction: column;
+            z-index: 2000;
+        }
+
+        .notification-panel.show {
+            display: flex;
+        }
+
+        .notification-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 16px;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .app-list-name {
+        .notification-title {
             font-size: 13px;
-        }
-
-        .start-tiles {
-            padding: 16px;
-            background: #1a1a1a;
-            border-top: 1px solid var(--border);
-        }
-
-        .tiles-title {
-            font-size: 12px;
             font-weight: 600;
-            margin-bottom: 12px;
         }
 
-        .tiles-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+        .notification-actions {
+            display: flex;
             gap: 4px;
         }
 
-        .tile {
+        .notification-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: background 0.1s ease;
+            font-size: 14px;
+        }
+
+        .notification-btn:hover {
+            background: var(--bg-menu-hover);
+        }
+
+        .notification-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .notification-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+        }
+
+        .notification-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(-2px);
+        }
+
+        .notification-item-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .notification-item-icon {
+            font-size: 16px;
+        }
+
+        .notification-item-app {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .notification-item-time {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-left: auto;
+        }
+
+        .notification-item-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .notification-item-message {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .notification-item.expanded .notification-item-details {
+            display: block;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border);
+        }
+
+        .notification-item-details {
+            display: none;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .notification-footer {
+            padding: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .clear-all-btn {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            font-family: inherit;
+        }
+
+        .clear-all-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .quick-settings {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .quick-settings-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .quick-setting-btn {
             aspect-ratio: 1;
-            background: var(--accent);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 4px;
             cursor: pointer;
             transition: all 0.1s ease;
-            gap: 4px;
+            padding: 8px;
         }
 
-        .tile:hover {
-            transform: scale(1.05);
-            filter: brightness(1.1);
+        .quick-setting-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        .tile-icon {
-            font-size: 28px;
+        .quick-setting-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
         }
 
-        .tile-name {
+        .quick-setting-icon {
+            font-size: 18px;
+        }
+
+        .quick-setting-label {
             font-size: 10px;
+            text-align: center;
+        }
+
+        .brightness-slider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        .brightness-icon {
+            font-size: 16px;
+        }
+
+        .slider {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .slider-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 2px;
+            width: 70%;
         }
 
         /* Scrollbar */
@@ -460,15 +704,32 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .no-notifications {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+            font-size: 13px;
+            gap: 12px;
+        }
+
+        .no-notifications-icon {
+            font-size: 48px;
+            opacity: 0.5;
         }
     </style>
 </head>
+
 <body>
     <!-- Desktop -->
     <div class="desktop" id="desktop">
@@ -493,11 +754,11 @@
     <!-- Context Menu -->
     <div class="context-menu" id="contextMenu">
         <div class="menu-item">
-            <span class="menu-icon">📄</span>
+            <span class="menu-icon">👁️</span>
             <span class="menu-text">View</span>
             <span class="menu-arrow">▶</span>
         </div>
-        <div class="menu-item has-submenu" data-submenu="sort">
+        <div class="menu-item">
             <span class="menu-icon">↕️</span>
             <span class="menu-text">Sort by</span>
             <span class="menu-arrow">▶</span>
@@ -510,18 +771,15 @@
             <span class="menu-text">Paste</span>
             <span class="menu-shortcut">Ctrl+V</span>
         </div>
-        <div class="menu-item">
-            <span class="menu-text">Paste shortcut</span>
-        </div>
         <div class="menu-item separator"></div>
-        <div class="menu-item has-submenu" data-submenu="new">
+        <div class="menu-item">
             <span class="menu-icon">📄</span>
             <span class="menu-text">New</span>
             <span class="menu-arrow">▶</span>
         </div>
         <div class="menu-item separator"></div>
         <div class="menu-item">
-            <span class="menu-icon">⚙️</span>
+            <span class="menu-icon">🖥️</span>
             <span class="menu-text">Display settings</span>
         </div>
         <div class="menu-item">
@@ -547,9 +805,6 @@
         </div>
         <div class="menu-item separator"></div>
         <div class="menu-item">
-            <span class="menu-text">Create shortcut</span>
-        </div>
-        <div class="menu-item">
             <span class="menu-text">Delete</span>
             <span class="menu-shortcut">Delete</span>
         </div>
@@ -564,52 +819,9 @@
         </div>
     </div>
 
-    <!-- Submenus -->
-    <div class="submenu" id="sortSubmenu">
-        <div class="menu-item">
-            <span class="menu-icon">✓</span>
-            <span class="menu-text">Name</span>
-        </div>
-        <div class="menu-item">
-            <span class="menu-text">Size</span>
-        </div>
-        <div class="menu-item">
-            <span class="menu-text">Item type</span>
-        </div>
-        <div class="menu-item">
-            <span class="menu-text">Date modified</span>
-        </div>
-    </div>
-
-    <div class="submenu" id="newSubmenu">
-        <div class="menu-item">
-            <span class="menu-icon">📁</span>
-            <span class="menu-text">Folder</span>
-        </div>
-        <div class="menu-item">
-            <span class="menu-icon">📄</span>
-            <span class="menu-text">Text Document</span>
-        </div>
-        <div class="menu-item">
-            <span class="menu-icon">📊</span>
-            <span class="menu-text">Microsoft Excel Worksheet</span>
-        </div>
-        <div class="menu-item">
-            <span class="menu-icon">📝</span>
-            <span class="menu-text">Microsoft Word Document</span>
-        </div>
-    </div>
-
     <!-- Start Menu -->
     <div class="start-menu" id="startMenu">
-        <div class="start-sidebar">
-            <div class="start-sidebar-icon">👤</div>
-            <div class="start-sidebar-icon">📄</div>
-            <div class="start-sidebar-icon">🖼️</div>
-            <div class="start-sidebar-icon">⚙️</div>
-            <div class="start-sidebar-icon" style="margin-top: auto;">⏻</div>
-        </div>
-        <div class="start-content">
+        <div class="start-body">
             <div class="start-apps">
                 <div class="app-group">
                     <div class="app-group-title">Most used</div>
@@ -624,6 +836,10 @@
                     <div class="app-list-item">
                         <div class="app-list-icon">⚙️</div>
                         <div class="app-list-name">Settings</div>
+                    </div>
+                    <div class="app-list-item">
+                        <div class="app-list-icon">📁</div>
+                        <div class="app-list-name">File Explorer</div>
                     </div>
                 </div>
                 <div class="app-group">
@@ -642,15 +858,14 @@
                     </div>
                 </div>
                 <div class="app-group">
-                    <div class="app-group-title">E</div>
+                    <div class="app-group-title">M</div>
                     <div class="app-list-item">
-                        <div class="app-list-icon">📊</div>
-                        <div class="app-list-name">Excel</div>
+                        <div class="app-list-icon">🎵</div>
+                        <div class="app-list-name">Music</div>
                     </div>
                 </div>
             </div>
             <div class="start-tiles">
-                <div class="tiles-title">Pinned</div>
                 <div class="tiles-grid">
                     <div class="tile" style="background: #0078d4;">
                         <div class="tile-icon">🌐</div>
@@ -676,8 +891,130 @@
                         <div class="tile-icon">🏪</div>
                         <div class="tile-name">Store</div>
                     </div>
+                    <div class="tile" style="background: #ff4500;">
+                        <div class="tile-icon">🎮</div>
+                        <div class="tile-name">Xbox</div>
+                    </div>
+                    <div class="tile" style="background: #8e44ad;">
+                        <div class="tile-icon">📷</div>
+                        <div class="tile-name">Photos</div>
+                    </div>
+                    <div class="tile" style="background: #16a085;">
+                        <div class="tile-icon">🎬</div>
+                        <div class="tile-name">Movies</div>
+                    </div>
                 </div>
             </div>
+        </div>
+        <div class="start-footer">
+            <div class="user-profile">
+                <div class="user-avatar">👤</div>
+                <div class="user-name">User</div>
+            </div>
+            <div class="start-footer-icons">
+                <div class="footer-icon" title="Documents">📁</div>
+                <div class="footer-icon" title="Pictures">🖼️</div>
+                <div class="footer-icon" title="Settings">⚙️</div>
+                <div class="footer-icon" title="Power">⏻</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="notification-header">
+            <div class="notification-title">NOTIFICATIONS</div>
+            <div class="notification-actions">
+                <div class="notification-btn" id="expandSettings" title="Expand">⚙️</div>
+                <div class="notification-btn" id="closeNotifications" title="Close">✕</div>
+            </div>
+        </div>
+
+        <div class="quick-settings" id="quickSettings" style="display: none;">
+            <div class="quick-settings-grid">
+                <div class="quick-setting-btn active">
+                    <div class="quick-setting-icon">📶</div>
+                    <div class="quick-setting-label">Wi-Fi</div>
+                </div>
+                <div class="quick-setting-btn">
+                    <div class="quick-setting-icon">🔊</div>
+                    <div class="quick-setting-label">Volume</div>
+                </div>
+                <div class="quick-setting-btn">
+                    <div class="quick-setting-icon">✈️</div>
+                    <div class="quick-setting-label">Airplane</div>
+                </div>
+                <div class="quick-setting-btn active">
+                    <div class="quick-setting-icon">🔵</div>
+                    <div class="quick-setting-label">Bluetooth</div>
+                </div>
+            </div>
+            <div class="brightness-slider">
+                <div class="brightness-icon">☀️</div>
+                <div class="slider">
+                    <div class="slider-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="notification-list" id="notificationList">
+            <div class="notification-item">
+                <div class="notification-item-header">
+                    <div class="notification-item-icon">🌐</div>
+                    <div class="notification-item-app">Microsoft Edge</div>
+                    <div class="notification-item-time">2 min ago</div>
+                </div>
+                <div class="notification-item-title">Download Complete</div>
+                <div class="notification-item-message">Windows-Update-KB5012345.exe has finished downloading</div>
+                <div class="notification-item-details">
+                    Click to view download location and open file
+                </div>
+            </div>
+
+            <div class="notification-item">
+                <div class="notification-item-header">
+                    <div class="notification-item-icon">🔔</div>
+                    <div class="notification-item-app">Windows Security</div>
+                    <div class="notification-item-time">15 min ago</div>
+                </div>
+                <div class="notification-item-title">Virus definitions updated</div>
+                <div class="notification-item-message">Your device is protected with the latest security updates</div>
+                <div class="notification-item-details">
+                    Last scan: Today at 10:30 AM • Threats found: 0
+                </div>
+            </div>
+
+            <div class="notification-item">
+                <div class="notification-item-header">
+                    <div class="notification-item-icon">📧</div>
+                    <div class="notification-item-app">Mail</div>
+                    <div class="notification-item-time">1 hour ago</div>
+                </div>
+                <div class="notification-item-title">New email from John Doe</div>
+                <div class="notification-item-message">Re: Project Update - The latest changes have been reviewed...
+                </div>
+                <div class="notification-item-details">
+                    john.doe@company.com • Attachments: 2 files
+                </div>
+            </div>
+
+            <div class="notification-item">
+                <div class="notification-item-header">
+                    <div class="notification-item-icon">⚙️</div>
+                    <div class="notification-item-app">Windows Update</div>
+                    <div class="notification-item-time">2 hours ago</div>
+                </div>
+                <div class="notification-item-title">Updates are available</div>
+                <div class="notification-item-message">New updates are ready to install. Restart to complete
+                    installation</div>
+                <div class="notification-item-details">
+                    Feature update • Size: 3.2 GB • Estimated time: 15 minutes
+                </div>
+            </div>
+        </div>
+
+        <div class="notification-footer">
+            <button class="clear-all-btn" id="clearAllBtn">Clear all notifications</button>
         </div>
     </div>
 
@@ -696,7 +1033,7 @@
         <div class="system-tray">
             <div class="tray-item">🔊</div>
             <div class="tray-item">📶</div>
-            <div class="tray-item">🔔</div>
+            <div class="tray-item" id="notificationButton">🔔</div>
             <div class="tray-item datetime">
                 <div class="time">10:47 AM</div>
                 <div class="date">10/7/2025</div>
@@ -705,253 +1042,289 @@
     </div>
 
     <script>
-        const desktop = document.getElementById('desktop');
-        const contextMenu = document.getElementById('contextMenu');
-        const iconContextMenu = document.getElementById('iconContextMenu');
-        const sortSubmenu = document.getElementById('sortSubmenu');
-        const newSubmenu = document.getElementById('newSubmenu');
-        const startButton = document.getElementById('startButton');
-        const startMenu = document.getElementById('startMenu');
-
-        let currentSubmenu = null;
-        let submenuTimeout = null;
-        let clickedIcon = null;
-
-        // Position menu with screen edge detection
-        function positionMenu(menu, x, y) {
-            menu.style.left = x + 'px';
-            menu.style.top = y + 'px';
-            menu.style.display = 'block';
-
-            const rect = menu.getBoundingClientRect();
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
-
-            // Adjust horizontal position if menu goes off right edge
-            if (rect.right > viewportWidth) {
-                menu.style.left = (viewportWidth - rect.width - 5) + 'px';
+        // Component: Desktop Icon Handler
+        class DesktopIconHandler {
+            constructor() {
+                this.icons = document.querySelectorAll('.desktop-icon');
+                this.selectedIcon = null;
+                this.init();
             }
 
-            // Adjust vertical position if menu goes off bottom edge
-            if (rect.bottom > viewportHeight) {
-                menu.style.top = (viewportHeight - rect.height - 5) + 'px';
+            init() {
+                this.icons.forEach(icon => {
+                    icon.addEventListener('click', (e) => this.selectIcon(icon, e));
+                    icon.addEventListener('dblclick', () => this.openIcon(icon));
+                });
             }
 
-            // Ensure menu doesn't go off left edge
-            if (rect.left < 0) {
-                menu.style.left = '5px';
-            }
-
-            // Ensure menu doesn't go off top edge
-            if (rect.top < 0) {
-                menu.style.top = '5px';
-            }
-        }
-
-        // Position submenu relative to parent item with edge detection
-        function positionSubmenu(submenu, parentItem, parentMenu) {
-            const parentRect = parentItem.getBoundingClientRect();
-            const parentMenuRect = parentMenu.getBoundingClientRect();
-            
-            let x = parentMenuRect.right - 2;
-            let y = parentRect.top;
-
-            submenu.style.left = x + 'px';
-            submenu.style.top = y + 'px';
-            submenu.style.display = 'block';
-
-            const rect = submenu.getBoundingClientRect();
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
-
-            // If submenu goes off right edge, show it on the left side
-            if (rect.right > viewportWidth) {
-                x = parentMenuRect.left - rect.width + 2;
-                submenu.style.left = x + 'px';
-            }
-
-            // Adjust vertical position if submenu goes off bottom edge
-            if (rect.bottom > viewportHeight) {
-                y = viewportHeight - rect.height - 5;
-                submenu.style.top = y + 'px';
-            }
-
-            // Ensure submenu doesn't go off top edge
-            if (rect.top < 0) {
-                submenu.style.top = '5px';
-            }
-        }
-
-        // Hide all menus
-        function hideAllMenus() {
-            contextMenu.classList.remove('show');
-            iconContextMenu.classList.remove('show');
-            sortSubmenu.classList.remove('show');
-            newSubmenu.classList.remove('show');
-            currentSubmenu = null;
-            if (submenuTimeout) {
-                clearTimeout(submenuTimeout);
-                submenuTimeout = null;
-            }
-        }
-
-        // Desktop right-click
-        desktop.addEventListener('contextmenu', (e) => {
-            if (e.target.closest('.desktop-icon')) return;
-            e.preventDefault();
-            hideAllMenus();
-            positionMenu(contextMenu, e.clientX, e.clientY);
-            contextMenu.classList.add('show');
-        });
-
-        // Desktop icon click
-        document.querySelectorAll('.desktop-icon').forEach(icon => {
-            icon.addEventListener('click', () => {
-                document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
-                icon.classList.add('selected');
-                clickedIcon = icon;
-            });
-
-            icon.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
-                icon.classList.add('selected');
-                clickedIcon = icon;
-                hideAllMenus();
-                positionMenu(iconContextMenu, e.clientX, e.clientY);
-                iconContextMenu.classList.add('show');
-            });
-        });
-
-        // Submenu handling with hover delay
-        document.querySelectorAll('.menu-item.has-submenu, [data-submenu]').forEach(item => {
-            item.addEventListener('mouseenter', function(e) {
-                const submenuName = this.getAttribute('data-submenu');
-                let submenu = null;
-
-                if (submenuName === 'sort') {
-                    submenu = sortSubmenu;
-                } else if (submenuName === 'new') {
-                    submenu = newSubmenu;
+            selectIcon(icon, event) {
+                if (!event.ctrlKey) {
+                    this.icons.forEach(i => i.classList.remove('selected'));
                 }
+                icon.classList.add('selected');
+                this.selectedIcon = icon;
+            }
 
-                if (submenu) {
-                    if (currentSubmenu && currentSubmenu !== submenu) {
-                        currentSubmenu.classList.remove('show');
+            deselectAll() {
+                this.icons.forEach(i => i.classList.remove('selected'));
+                this.selectedIcon = null;
+            }
+
+            openIcon(icon) {
+                const name = icon.dataset.name;
+                console.log('Opening:', name);
+            }
+        }
+
+        // Component: Context Menu Handler
+        class ContextMenuHandler {
+            constructor() {
+                this.contextMenu = document.getElementById('contextMenu');
+                this.iconContextMenu = document.getElementById('iconContextMenu');
+                this.currentMenu = null;
+                this.init();
+            }
+
+            init() {
+                document.addEventListener('contextmenu', (e) => this.handleContextMenu(e));
+                document.addEventListener('click', () => this.hideAll());
+
+                // Menu item clicks
+                document.querySelectorAll('.menu-item:not(.separator)').forEach(item => {
+                    item.addEventListener('click', () => {
+                        console.log('Menu action:', item.querySelector('.menu-text')?.textContent);
+                        this.hideAll();
+                    });
+                });
+            }
+
+            handleContextMenu(e) {
+                e.preventDefault();
+                const icon = e.target.closest('.desktop-icon');
+
+                if (icon) {
+                    this.showMenu(this.iconContextMenu, e.clientX, e.clientY);
+                } else if (e.target.closest('.desktop')) {
+                    this.showMenu(this.contextMenu, e.clientX, e.clientY);
+                }
+            }
+
+            showMenu(menu, x, y) {
+                this.hideAll();
+                this.positionMenu(menu, x, y);
+                menu.classList.add('show');
+                this.currentMenu = menu;
+            }
+
+            positionMenu(menu, x, y) {
+                menu.style.left = x + 'px';
+                menu.style.top = y + 'px';
+                menu.style.display = 'block';
+
+                const rect = menu.getBoundingClientRect();
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+
+                if (rect.right > vw) {
+                    menu.style.left = (vw - rect.width - 5) + 'px';
+                }
+                if (rect.bottom > vh) {
+                    menu.style.top = (vh - rect.height - 5) + 'px';
+                }
+            }
+
+            hideAll() {
+                this.contextMenu.classList.remove('show');
+                this.iconContextMenu.classList.remove('show');
+                this.currentMenu = null;
+            }
+        }
+
+        // Component: Start Menu Handler
+        class StartMenuHandler {
+            constructor() {
+                this.startButton = document.getElementById('startButton');
+                this.startMenu = document.getElementById('startMenu');
+                this.isOpen = false;
+                this.init();
+            }
+
+            init() {
+                this.startButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggle();
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.start-menu') && !e.target.closest('.start-button')) {
+                        this.close();
                     }
+                });
 
-                    submenuTimeout = setTimeout(() => {
-                        const parentMenu = this.closest('.context-menu');
-                        positionSubmenu(submenu, this, parentMenu);
-                        submenu.classList.add('show');
-                        currentSubmenu = submenu;
-                    }, 200);
-                }
-            });
-        });
+                // App clicks
+                document.querySelectorAll('.app-list-item, .tile').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const name = item.querySelector('.app-list-name, .tile-name')?.textContent;
+                        console.log('Opening app:', name);
+                        this.close();
+                    });
+                });
+            }
 
-        // Prevent context menu on right-click in menus
-        [contextMenu, iconContextMenu, sortSubmenu, newSubmenu].forEach(menu => {
-            menu.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-            });
-        });
+            toggle() {
+                this.isOpen ? this.close() : this.open();
+            }
 
-        // Start button
-        startButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            startMenu.classList.toggle('show');
-            hideAllMenus();
-        });
+            open() {
+                this.startMenu.classList.add('show');
+                this.isOpen = true;
+            }
 
-        // Menu item clicks
-        document.querySelectorAll('.menu-item:not(.separator):not(.disabled)').forEach(item => {
-            item.addEventListener('click', function() {
-                if (!this.hasAttribute('data-submenu') && !this.classList.contains('has-submenu')) {
-                    console.log('Clicked:', this.querySelector('.menu-text')?.textContent);
-                    hideAllMenus();
-                }
-            });
-        });
-
-        // App items click
-        document.querySelectorAll('.app-list-item, .tile').forEach(item => {
-            item.addEventListener('click', () => {
-                console.log('Opened app:', item.querySelector('.app-list-name, .tile-name')?.textContent);
-                startMenu.classList.remove('show');
-            });
-        });
-
-        // Update time
-        function updateTime() {
-            const now = new Date();
-            const time = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-            const date = now.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
-            const timeEl = document.querySelector('.time');
-            const dateEl = document.querySelector('.date');
-            if (timeEl) timeEl.textContent = time;
-            if (dateEl) dateEl.textContent = date;
+            close() {
+                this.startMenu.classList.remove('show');
+                this.isOpen = false;
+            }
         }
-        updateTime();
-        setInterval(updateTime, 60000);
 
-        // ESC key to close menus
+        // Component: Notification Panel Handler
+        class NotificationPanelHandler {
+            constructor() {
+                this.panel = document.getElementById('notificationPanel');
+                this.notificationButton = document.getElementById('notificationButton');
+                this.closeButton = document.getElementById('closeNotifications');
+                this.expandButton = document.getElementById('expandSettings');
+                this.clearAllButton = document.getElementById('clearAllBtn');
+                this.quickSettings = document.getElementById('quickSettings');
+                this.notificationList = document.getElementById('notificationList');
+                this.isOpen = false;
+                this.settingsExpanded = false;
+                this.init();
+            }
+
+            init() {
+                this.notificationButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggle();
+                });
+
+                this.closeButton.addEventListener('click', () => this.close());
+
+                this.expandButton.addEventListener('click', () => this.toggleSettings());
+
+                this.clearAllButton.addEventListener('click', () => this.clearAll());
+
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.notification-panel') && !e.target.closest('#notificationButton')) {
+                        this.close();
+                    }
+                });
+
+                // Notification item expand on click
+                document.querySelectorAll('.notification-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        item.classList.toggle('expanded');
+                    });
+                });
+
+                // Quick setting toggles
+                document.querySelectorAll('.quick-setting-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        btn.classList.toggle('active');
+                    });
+                });
+            }
+
+            toggle() {
+                this.isOpen ? this.close() : this.open();
+            }
+
+            open() {
+                this.panel.classList.add('show');
+                this.isOpen = true;
+            }
+
+            close() {
+                this.panel.classList.remove('show');
+                this.isOpen = false;
+                this.settingsExpanded = false;
+                this.quickSettings.style.display = 'none';
+            }
+
+            toggleSettings() {
+                this.settingsExpanded = !this.settingsExpanded;
+                this.quickSettings.style.display = this.settingsExpanded ? 'block' : 'none';
+            }
+
+            clearAll() {
+                const items = this.notificationList.querySelectorAll('.notification-item');
+                items.forEach(item => {
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateX(100px)';
+                });
+
+                setTimeout(() => {
+                    this.notificationList.innerHTML = `
+                        <div class="no-notifications">
+                            <div class="no-notifications-icon">🔔</div>
+                            <div>No new notifications</div>
+                        </div>
+                    `;
+                }, 300);
+            }
+        }
+
+        // Component: Time Updater
+        class TimeUpdater {
+            constructor() {
+                this.timeElement = document.querySelector('.time');
+                this.dateElement = document.querySelector('.date');
+                this.init();
+            }
+
+            init() {
+                this.update();
+                setInterval(() => this.update(), 60000);
+            }
+
+            update() {
+                const now = new Date();
+                const time = now.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit'
+                });
+                const date = now.toLocaleDateString('en-US', {
+                    month: 'numeric',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+
+                if (this.timeElement) this.timeElement.textContent = time;
+                if (this.dateElement) this.dateElement.textContent = date;
+            }
+        }
+
+        // Initialize all components
+        const desktopIcons = new DesktopIconHandler();
+        const contextMenus = new ContextMenuHandler();
+        const startMenu = new StartMenuHandler();
+        const notificationPanel = new NotificationPanelHandler();
+        const timeUpdater = new TimeUpdater();
+
+        // Global event listeners
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.desktop-icon')) {
+                desktopIcons.deselectAll();
+            }
+        });
+
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                hideAllMenus();
-                startMenu.classList.remove('show');
+                contextMenus.hideAll();
+                startMenu.close();
+                notificationPanel.close();
             }
         });
     </script>
 </body>
-</html>300);
-                }
-            });
 
-            item.addEventListener('mouseleave', function() {
-                if (submenuTimeout) {
-                    clearTimeout(submenuTimeout);
-                    submenuTimeout = null;
-                }
-            });
-        });
-
-        // Keep submenu open when hovering over it
-        [sortSubmenu, newSubmenu].forEach(submenu => {
-            submenu.addEventListener('mouseenter', () => {
-                if (submenuTimeout) {
-                    clearTimeout(submenuTimeout);
-                    submenuTimeout = null;
-                }
-            });
-        });
-
-        // Close menus on click outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.context-menu') && !e.target.closest('.submenu')) {
-                hideAllMenus();
-            }
-            if (!e.target.closest('.desktop-icon')) {
-                document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
-                clickedIcon = null;
-            }
-            if (!e.target.closest('.start-menu') && !e.target.closest('.start-button')) {
-                startMenu.classList.remove('show');
-            }
-        });
-
-        // Close submenus when leaving menu area
-        [contextMenu, iconContextMenu].forEach(menu => {
-            menu.addEventListener('mouseleave', (e) => {
-                const toElement = e.relatedTarget;
-                if (!toElement || (!toElement.closest('.submenu') && !toElement.closest('.context-menu'))) {
-                    setTimeout(() => {
-                        if (!contextMenu.matches(':hover') && !iconContextMenu.matches(':hover') && 
-                            !sortSubmenu.matches(':hover') && !newSubmenu.matches(':hover')) {
-                            if (currentSubmenu) {
-                                currentSubmenu.classList.remove('show');
-                                currentSubmenu = null;
-                            }
-                        }
-                    },
+</html>
