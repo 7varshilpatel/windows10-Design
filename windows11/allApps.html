@@ -386,6 +386,79 @@
                 padding-right: 12px;
             }
         }
+
+        /* Alphabet Grid Styles */
+        .alphabet-grid {
+            display: grid;
+            justify-content: center;
+            grid-template-columns: repeat(4, 0fr);
+            gap: 2px;
+            flex: 1;
+            padding: 18px 0;
+            overflow-y: auto;
+        }
+
+        .letter-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50px;
+            width: 50px;
+            background: transparent;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 17px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .letter-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .letter-btn.disabled {
+            color: rgba(255, 255, 255, 0.3);
+            background: transparent;
+            cursor: default;
+        }
+
+        .letter-btn.disabled:hover {
+            background: transparent;
+            border-color: transparent;
+        }
+
+        /* View Switching Styles */
+        .app-view,
+        .grid-view {
+            transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .grid-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 16px;
+            box-sizing: border-box;
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        .alphabet-grid {
+            height: 100%;
+        }
+
+        .scroll-content.show-grid .app-view {
+            opacity: 0;
+            transform: translateX(-50%);
+        }
+
+        .scroll-content.show-grid .grid-view {
+            opacity: 1;
+            transform: translateX(0);
+        }
     </style>
 </head>
 
@@ -406,7 +479,7 @@
         </div>
         <div class="scroll-wrapper">
             <div class="scroll-content" tabindex="0" aria-label="Scrollable content">
-
+                <div class="app-view">
                 <div class="app-list-item">
                     <div class="app-list-letter">Most used</div>
                 </div>
@@ -745,6 +818,50 @@
                     <div class="app-list-icon">🌐</div>
                     <div class="app-list-name">Twitter (X)</div>
                 </div>
+                </div>
+
+                <div class="grid-view">
+                    <div class="alphabet-grid">
+                <div class="letter-btn">🕐</div>
+                <div class="letter-btn">&</div>
+                <div class="letter-btn">#</div>
+                <div class="letter-btn">A</div>
+
+                <div class="letter-btn">B</div>
+                <div class="letter-btn">C</div>
+                <div class="letter-btn disabled">D</div>
+                <div class="letter-btn disabled">E</div>
+
+                <div class="letter-btn">F</div>
+                <div class="letter-btn">G</div>
+                <div class="letter-btn disabled">H</div>
+                <div class="letter-btn disabled">I</div>
+
+                <div class="letter-btn disabled">J</div>
+                <div class="letter-btn disabled">K</div>
+                <div class="letter-btn disabled">L</div>
+                <div class="letter-btn">M</div>
+
+                <div class="letter-btn">N</div>
+                <div class="letter-btn">O</div>
+                <div class="letter-btn">P</div>
+                <div class="letter-btn">Q</div>
+
+                <div class="letter-btn disabled">R</div>
+                <div class="letter-btn">S</div>
+                <div class="letter-btn">T</div>
+                <div class="letter-btn disabled">U</div>
+
+                <div class="letter-btn disabled">V</div>
+                <div class="letter-btn">W</div>
+                <div class="letter-btn">X</div>
+                <div class="letter-btn disabled">Y</div>
+
+                <div class="letter-btn disabled">Z</div>
+                <div class="letter-btn">🌐</div>
+            </div>
+                </div>
+
             </div>
 
             <!-- Custom scrollbar overlay -->
@@ -809,8 +926,9 @@
 
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
 
+        // App sorting logic
         document.addEventListener("DOMContentLoaded", () => {
-            const allApps = Array.from(document.querySelectorAll('.app-list-item'))
+            const allApps = Array.from(document.querySelectorAll('.app-view .app-list-item'))
                 .filter(item => item.querySelector('.app-list-name')); // only actual app entries
 
             // Sort alphabetically by name
@@ -822,7 +940,7 @@
 
             // Prepare section map (A–Z, #, &, 🌐)
             const sectionMap = {};
-            document.querySelectorAll('.app-list-letter').forEach(letterDiv => {
+            document.querySelectorAll('.app-view .app-list-letter').forEach(letterDiv => {
                 const label = letterDiv.textContent.trim().toUpperCase();
                 sectionMap[label] = letterDiv.parentNode; // store parent for easy insert
             });
@@ -852,6 +970,48 @@
                     el.style.display = 'none';
                 }
             });
+        });
+
+        // View switching logic
+        let currentView = 'app';
+        const scrollContent = document.querySelector('.scroll-content');
+        const appView = document.querySelector('.app-view');
+        const gridView = document.querySelector('.grid-view');
+        const content = document.querySelector('.scroll-content');
+        gridView.style.display = 'none';
+
+        // Add click listeners to letter headers (single char only)
+        document.querySelectorAll('.app-view .app-list-item').forEach(item => {
+            const letterDiv = item.querySelector('.app-list-letter');
+            if (letterDiv && letterDiv.textContent.trim().length === 1) {
+                item.addEventListener('click', () => {
+                    if (currentView === 'app') {
+                        gridView.style.display = 'block';
+                        scrollContent.classList.add('show-grid');
+                        setTimeout(() => {
+                            appView.style.display = 'none';
+                            content.scrollTop = 0;
+                            content.dispatchEvent(new Event('scroll'));
+                            currentView = 'grid';
+                        }, 250);
+                    }
+                });
+            }
+        });
+
+        // Back button
+        const viewAll = document.querySelector('.view-all');
+        viewAll.addEventListener('click', () => {
+            if (currentView === 'grid') {
+                appView.style.display = 'block';
+                scrollContent.classList.remove('show-grid');
+                setTimeout(() => {
+                    gridView.style.display = 'none';
+                    content.scrollTop = 0;
+                    content.dispatchEvent(new Event('scroll'));
+                    currentView = 'app';
+                }, 250);
+            }
         });
 
         (function () {
