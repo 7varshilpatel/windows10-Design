@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anchor List All Apps</title>
+    <style>
+        :root {
+            --taskbar-height: 48px;
+            --bg-acrylic: rgba(32, 32, 32, 0.85);
+            --text-primary: #fff;
+            --text-secondary: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --accent: #0078d4;
+            --border: rgba(255, 255, 255, 0.08);
+            --hover-bg: rgba(255, 255, 255, 0.06);
+            --radius-md: 8px;
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.32);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+            background: #1e3a5f;
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ===== Taskbar ===== */
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--taskbar-height);
+            background: var(--bg-acrylic);
+            backdrop-filter: blur(30px);
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            gap: 4px;
+            border-top: 1px solid var(--border);
+        }
+
+        .taskbar-icon {
+            width: 48px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .taskbar-icon:hover {
+            background: var(--hover-bg);
+        }
+
+        .taskbar-icon.active::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            width: 20px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        /* ===== Start Menu ===== */
+        .start-menu {
+            position: fixed;
+            bottom: calc(var(--taskbar-height) + 8px);
+            left: calc((600px/2) + 5px);
+            width: 600px;
+            height: 680px;
+            background: var(--bg-acrylic);
+            backdrop-filter: blur(40px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transform: translate(-50%, 30px) scale(0.96);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .start-menu.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, 0) scale(1);
+        }
+
+        .start-search {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 8px 12px;
+        }
+
+        .search-box input {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .start-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-left: 12px;
+        }
+
+        .view-all {
+            font-size: 12px;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .view-all:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .start-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px;
+            border-radius: var(--radius-md);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-name {
+            font-size: 13px;
+        }
+
+        .power-button {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .power-button:hover {
+            background: var(--hover-bg);
+        }
+
+        /* .alphabet-grid {
+            height: 483px;
+            display: grid;
+            justify-content: center;
+            grid-template-columns: repeat(4, 30px);
+            padding: 60px 0;
+        }
+
+        .letter-btn {
+            height: 40px;
+            width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border-radius: var(--border-radius);
+            font-size: 19px;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.15s ease;
+            z-index: 0;
+        }
+
+        .letter-btn:hover {
+            background: var(--hover-bg);
+            transform: scale(1.5);
+            z-index: 1;
+        }
+
+
+
+        .letter-btn.disabled {
+            color: var(--text-muted);
+            opacity: 0.4;
+            cursor: default;
+        }
+
+        .letter-btn.disabled:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--border);
+        } */
+
+        .alphabet-grid {
+            display: grid;
+            justify-content: center;
+            grid-template-columns: repeat(4, 0fr);
+            gap: 2px;
+            flex: 1;
+            padding: 34.5px 0;
+            overflow-y: auto;
+        }
+
+        .letter-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50px;
+            width: 50px;
+            background: transparent;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 17px;
+            font-weight: 400;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .letter-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .letter-btn.disabled {
+            color: rgba(255, 255, 255, 0.3);
+            background: transparent;
+            cursor: default;
+        }
+
+        .letter-btn.disabled:hover {
+            background: transparent;
+            border-color: transparent;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== Start Menu ===== -->
+    <div class="start-menu" id="startMenu">
+        <div class="start-search">
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" placeholder="Search for apps, settings, and documents">
+            </div>
+        </div>
+
+        <div class="section-header">
+            <div class="section-title">All apps</div>
+            <div class="view-all">‹ Back</div>
+        </div>
+        <div class="scroll-content" tabindex="0" aria-label="Scrollable content">
+            <div class="alphabet-grid">
+                <div class="letter-btn">🕐</div>
+                <div class="letter-btn">&</div>
+                <div class="letter-btn">#</div>
+                <div class="letter-btn">A</div>
+
+                <div class="letter-btn">B</div>
+                <div class="letter-btn">C</div>
+                <div class="letter-btn disabled">D</div>
+                <div class="letter-btn disabled">E</div>
+
+                <div class="letter-btn">F</div>
+                <div class="letter-btn">G</div>
+                <div class="letter-btn disabled">H</div>
+                <div class="letter-btn disabled">I</div>
+
+                <div class="letter-btn disabled">J</div>
+                <div class="letter-btn disabled">K</div>
+                <div class="letter-btn disabled">L</div>
+                <div class="letter-btn">M</div>
+
+                <div class="letter-btn">N</div>
+                <div class="letter-btn">O</div>
+                <div class="letter-btn">P</div>
+                <div class="letter-btn">Q</div>
+
+                <div class="letter-btn disabled">R</div>
+                <div class="letter-btn">S</div>
+                <div class="letter-btn">T</div>
+                <div class="letter-btn disabled">U</div>
+
+                <div class="letter-btn disabled">V</div>
+                <div class="letter-btn">W</div>
+                <div class="letter-btn">X</div>
+                <div class="letter-btn disabled">Y</div>
+
+                <div class="letter-btn disabled">Z</div>
+                <div class="letter-btn">🌐</div>
+            </div>
+        </div>
+        <div class="start-footer">
+            <div class="user-profile">
+                <div class="user-avatar">U</div>
+                <div class="user-name">User</div>
+            </div>
+            <div class="power-button">⏻</div>
+        </div>
+    </div>
+    </div>
+
+
+    <!-- ===== Taskbar ===== -->
+    <div class="taskbar">
+        <div class="taskbar-icon" id="startBtn">
+            <div>⊞</div>
+        </div>
+        <div class="taskbar-icon"><span>🔍</span></div>
+        <div class="taskbar-icon"><span>📎</span></div>
+        <div class="taskbar-icon active"><span>🌐</span></div>
+        <div class="taskbar-icon"><span>📁</span></div>
+        <div class="taskbar-icon"><span>📊</span></div>
+    </div>
+
+    <script>
+        const startBtn = document.getElementById('startBtn');
+        const startMenu = document.getElementById('startMenu');
+        let activePanel = null;
+
+        function closeAll() {
+            startMenu.classList.remove('open');
+            activePanel = null;
+        }
+
+        document.addEventListener('click', e => {
+            if (activePanel === 'start' && !startMenu.contains(e.target) && e.target !== startBtn) closeAll();
+        });
+
+        startBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            if (activePanel === 'start') closeAll();
+            else { closeAll(); startMenu.classList.add('open'); activePanel = 'start'; }
+        });
+
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+    </script>
+</body>
+
+</html>

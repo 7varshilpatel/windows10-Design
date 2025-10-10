@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Apps</title>
+    <style>
+        :root {
+            --taskbar-height: 48px;
+            --bg-acrylic: rgba(32, 32, 32, 0.85);
+            --text-primary: #fff;
+            --text-secondary: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --accent: #0078d4;
+            --border: rgba(255, 255, 255, 0.08);
+            --hover-bg: rgba(255, 255, 255, 0.06);
+            --radius-md: 8px;
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.32);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif;
+            background: #1e3a5f;
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ===== Taskbar ===== */
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--taskbar-height);
+            background: var(--bg-acrylic);
+            backdrop-filter: blur(30px);
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            gap: 4px;
+            border-top: 1px solid var(--border);
+        }
+
+        .taskbar-icon {
+            width: 48px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .taskbar-icon:hover {
+            background: var(--hover-bg);
+        }
+
+        .taskbar-icon.active::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            width: 20px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        /* ===== Start Menu ===== */
+        .start-menu {
+            position: fixed;
+            bottom: calc(var(--taskbar-height) + 8px);
+            left: calc((600px/2) + 5px);
+            width: 600px;
+            height: 680px;
+            background: var(--bg-acrylic);
+            backdrop-filter: blur(40px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transform: translate(-50%, 30px) scale(0.96);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .start-menu.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, 0) scale(1);
+        }
+
+        .start-search {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 8px 12px;
+        }
+
+        .search-box input {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .start-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-left: 12px;
+        }
+
+        .view-all {
+            font-size: 12px;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .view-all:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .app-list-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 8px 12px;
+            border-radius: var(--radius-md);
+            transition: background 0.15s;
+            cursor: pointer;
+        }
+
+        .app-list-item:hover {
+            background: var(--hover-bg);
+        }
+
+        .app-list-icon {
+            font-size: 15px;
+        }
+
+        .app-list-name {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .app-list-letter {
+            font-size: 15px;
+        }
+
+        /* ===== Footer ===== */
+        .start-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px;
+            border-radius: var(--radius-md);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-name {
+            font-size: 13px;
+        }
+
+        .power-button {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .power-button:hover {
+            background: var(--hover-bg);
+        }
+
+        .scroll-wrapper {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* Scrollable content */
+        .scroll-content {
+            height: 100%;
+            overflow-y: auto;
+            padding: 16px;
+            line-height: 1.75;
+            color: var(--text-primary);
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .scroll-content::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* ---------- Custom Scrollbar ---------- */
+        .custom-scrollbar {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            width: 4px;
+            z-index: 40;
+            pointer-events: auto;
+            transition: width 220ms cubic-bezier(.2, .8, .2, 1), background 160ms ease;
+        }
+
+        .scrollbar-track {
+            position: absolute;
+            top: 17px;
+            bottom: 17px;
+            right: 0;
+            width: 100%;
+            background: transparent;
+            overflow: visible;
+            transition: background 160ms ease;
+        }
+
+        .scrollbar-thumb {
+            position: absolute;
+            right: 0;
+            width: 100%;
+            background: #555;
+            border-radius: 10px;
+            min-height: 40px;
+            cursor: grab;
+            transition: background 140ms ease, height 120ms ease, top 120ms ease;
+            will-change: top, height;
+        }
+
+        .scrollbar-thumb:active {
+            cursor: grabbing;
+        }
+
+        /* Arrow buttons */
+        .scrollbar-arrow {
+            position: absolute;
+            right: 0;
+            width: 17px;
+            height: 17px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #323232;
+            color: #cfcfcf;
+            opacity: 0;
+            transform: translateX(6px);
+            transition: opacity 220ms cubic-bezier(.2, .8, .2, 1), transform 220ms cubic-bezier(.2, .8, .2, 1), color 120ms ease;
+            pointer-events: none;
+            z-index: 45;
+            user-select: none;
+        }
+
+        .scrollbar-arrow-up {
+            top: 0;
+        }
+
+        .scrollbar-arrow-down {
+            bottom: 0;
+        }
+
+        .scrollbar-arrow svg {
+            width: 9px;
+            height: 9px;
+            stroke: currentColor;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .scrollbar-arrow:hover {
+            color: #aeaeae;
+        }
+
+        .scrollbar-arrow:active {
+            background: #aeaeae;
+            color: #1b1b1b;
+        }
+
+        .scrollbar-arrow:focus {
+            outline: 2px solid rgba(0, 120, 215, 0.14);
+            outline-offset: 2px;
+        }
+
+        /* ---------- Expanded State (Win10) ---------- */
+        .custom-scrollbar.expanded {
+            width: 17px;
+            background: transparent;
+            border-radius: 0;
+        }
+
+        .custom-scrollbar.expanded .scrollbar-track {
+            background: #323232;
+        }
+
+        .custom-scrollbar.expanded .scrollbar-thumb {
+            background: #5d5d5d;
+        }
+
+        .custom-scrollbar.expanded .scrollbar-thumb:hover {
+            background: #aeaeae;
+        }
+
+        .custom-scrollbar.expanded .scrollbar-arrow {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        .custom-scrollbar.expanded .scrollbar-thumb.dragging {
+            background: #aaaaaa;
+        }
+
+        /* Responsive fallback */
+        @media (max-width:520px) {
+            .custom-scrollbar {
+                display: none;
+            }
+
+            .scroll-content {
+                padding-right: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== Start Menu ===== -->
+    <div class="start-menu" id="startMenu">
+        <div class="start-search">
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" placeholder="Search for apps, settings, and documents">
+            </div>
+        </div>
+
+        <div class="section-header">
+            <div class="section-title">All apps</div>
+            <div class="view-all">‹ Back</div>
+        </div>
+        <div class="scroll-wrapper">
+            <div class="scroll-content" tabindex="0" aria-label="Scrollable content">
+
+                <div class="app-list-item">
+                    <div class="app-list-letter">Most used</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">&</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">#</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">A</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">B</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">C</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">D</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">E</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">F</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">G</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">H</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">I</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">J</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">K</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">L</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">M</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">N</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">O</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">P</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">Q</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">R</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">S</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">T</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">U</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">V</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">W</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">X</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">Y</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">Z</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-letter">🌐</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🌐</div>
+                    <div class="app-list-name">Microsoft Edge</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🗒️</div>
+                    <div class="app-list-name">Notepad</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📁</div>
+                    <div class="app-list-name">File Explorer</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">💬</div>
+                    <div class="app-list-name">Chat</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📸</div>
+                    <div class="app-list-name">Camera</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🎵</div>
+                    <div class="app-list-name">Groove Music</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🎥</div>
+                    <div class="app-list-name">Movies & TV</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🕹️</div>
+                    <div class="app-list-name">Xbox Game Bar</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🛒</div>
+                    <div class="app-list-name">Microsoft Store</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🖼️</div>
+                    <div class="app-list-name">Photos</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🧭</div>
+                    <div class="app-list-name">Maps</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📰</div>
+                    <div class="app-list-name">News</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📧</div>
+                    <div class="app-list-name">Mail</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📅</div>
+                    <div class="app-list-name">Calendar</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🧮</div>
+                    <div class="app-list-name">Calculator</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">⚙️</div>
+                    <div class="app-list-name">Settings</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📝</div>
+                    <div class="app-list-name">WordPad</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">💻</div>
+                    <div class="app-list-name">PowerShell</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🗂️</div>
+                    <div class="app-list-name">Task Manager</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🔒</div>
+                    <div class="app-list-name">Windows Security</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📊</div>
+                    <div class="app-list-name">Excel</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📘</div>
+                    <div class="app-list-name">OneNote</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🧠</div>
+                    <div class="app-list-name">Cortana</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🎮</div>
+                    <div class="app-list-name">Xbox Console</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📞</div>
+                    <div class="app-list-name">Skype</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">☁️</div>
+                    <div class="app-list-name">OneDrive</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🔔</div>
+                    <div class="app-list-name">Alarm & Clock</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🖌️</div>
+                    <div class="app-list-name">Paint</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🎨</div>
+                    <div class="app-list-name">Paint 3D</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🗑️</div>
+                    <div class="app-list-name">Recycle Bin</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📚</div>
+                    <div class="app-list-name">Books</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🎤</div>
+                    <div class="app-list-name">Voice Recorder</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🎬</div>
+                    <div class="app-list-name">Video Editor</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🔍</div>
+                    <div class="app-list-name">Search</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🧰</div>
+                    <div class="app-list-name">Snipping Tool</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">💾</div>
+                    <div class="app-list-name">Save</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🛠️</div>
+                    <div class="app-list-name">Troubleshoot</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📡</div>
+                    <div class="app-list-name">Connect</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📌</div>
+                    <div class="app-list-name">Sticky Notes</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🎧</div>
+                    <div class="app-list-name">Spotify</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📺</div>
+                    <div class="app-list-name">TV</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">💡</div>
+                    <div class="app-list-name">Tips</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🖥️</div>
+                    <div class="app-list-name">Remote Desktop</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📄</div>
+                    <div class="app-list-name">Word</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📈</div>
+                    <div class="app-list-name">PowerPoint</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🔊</div>
+                    <div class="app-list-name">Sound Recorder</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🖨️</div>
+                    <div class="app-list-name">Printer</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🧩</div>
+                    <div class="app-list-name">Extensions</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📱</div>
+                    <div class="app-list-name">Your Phone</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🔗</div>
+                    <div class="app-list-name">Link</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🎯</div>
+                    <div class="app-list-name">Game Bar</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">⚡</div>
+                    <div class="app-list-name">&TV</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📢</div>
+                    <div class="app-list-name">@Voice Reader</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">❗</div>
+                    <div class="app-list-name">!Tunes</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🔗</div>
+                    <div class="app-list-name">(Link Shortcut)</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📦</div>
+                    <div class="app-list-name">123 PDF Reader</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">📁</div>
+                    <div class="app-list-name">7-Zip</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🔢</div>
+                    <div class="app-list-name">2048 Game</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🌐</div>
+                    <div class="app-list-name">YouTube (Web)</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🌐</div>
+                    <div class="app-list-name">ChatGPT</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🌐</div>
+                    <div class="app-list-name">GitHub</div>
+                </div>
+                <div class="app-list-item">
+                    <div class="app-list-icon">🌐</div>
+                    <div class="app-list-name">Twitter (X)</div>
+                </div>
+            </div>
+
+            <!-- Custom scrollbar overlay -->
+            <div class="custom-scrollbar" aria-hidden="false">
+                <div class="scrollbar-arrow scrollbar-arrow-up" role="button" tabindex="0" aria-label="Scroll up">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 16L12 8L20 16"></path>
+                    </svg>
+                </div>
+                <div class="scrollbar-track" aria-hidden="true">
+                    <div class="scrollbar-thumb" role="slider" aria-orientation="vertical" tabindex="0"></div>
+                </div>
+                <div class="scrollbar-arrow scrollbar-arrow-down" role="button" tabindex="0" aria-label="Scroll down">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 8L12 16L20 8"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+        <div class="start-footer">
+            <div class="user-profile">
+                <div class="user-avatar">U</div>
+                <div class="user-name">User</div>
+            </div>
+            <div class="power-button">⏻</div>
+        </div>
+    </div>
+    </div>
+
+
+    <!-- ===== Taskbar ===== -->
+    <div class="taskbar">
+        <div class="taskbar-icon" id="startBtn">
+            <div>⊞</div>
+        </div>
+        <div class="taskbar-icon"><span>🔍</span></div>
+        <div class="taskbar-icon"><span>📎</span></div>
+        <div class="taskbar-icon active"><span>🌐</span></div>
+        <div class="taskbar-icon"><span>📁</span></div>
+        <div class="taskbar-icon"><span>📊</span></div>
+    </div>
+
+    <script>
+        const startBtn = document.getElementById('startBtn');
+        const startMenu = document.getElementById('startMenu');
+        let activePanel = null;
+
+        function closeAll() {
+            startMenu.classList.remove('open');
+            activePanel = null;
+        }
+
+        document.addEventListener('click', e => {
+            if (activePanel === 'start' && !startMenu.contains(e.target) && e.target !== startBtn) closeAll();
+        });
+
+        startBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            if (activePanel === 'start') closeAll();
+            else { closeAll(); startMenu.classList.add('open'); activePanel = 'start'; }
+        });
+
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const allApps = Array.from(document.querySelectorAll('.app-list-item'))
+                .filter(item => item.querySelector('.app-list-name')); // only actual app entries
+
+            // Sort alphabetically by name
+            allApps.sort((a, b) => {
+                const nameA = a.querySelector('.app-list-name').textContent.trim().toLowerCase();
+                const nameB = b.querySelector('.app-list-name').textContent.trim().toLowerCase();
+                return nameA.localeCompare(nameB);
+            });
+
+            // Prepare section map (A–Z, #, &, 🌐)
+            const sectionMap = {};
+            document.querySelectorAll('.app-list-letter').forEach(letterDiv => {
+                const label = letterDiv.textContent.trim().toUpperCase();
+                sectionMap[label] = letterDiv.parentNode; // store parent for easy insert
+            });
+
+            // Function to determine proper section
+            function getSection(name) {
+                const first = name[0];
+                if (/[A-Za-z]/.test(first)) return first.toUpperCase(); // A–Z
+                if (/[0-9]/.test(first)) return '#';                    // Numbers
+                if (/[\u{1F310}]/u.test(first)) return '🌐';            // Globe / web apps
+                return '&';                                              // Symbols (&, @, !, etc.)
+            }
+
+            // Insert each app under correct section
+            allApps.forEach(app => {
+                const name = app.querySelector('.app-list-name').textContent.trim();
+                const section = getSection(name);
+                if (sectionMap[section]) {
+                    sectionMap[section].insertAdjacentElement('afterend', app);
+                }
+            });
+
+            // Hide letters that have no apps after them
+            Object.entries(sectionMap).forEach(([label, el]) => {
+                const next = el.nextElementSibling;
+                if (!next || !next.querySelector('.app-list-name')) {
+                    el.style.display = 'none';
+                }
+            });
+        });
+
+        (function () {
+            const wrapper = document.querySelector('.scroll-wrapper');
+            const content = wrapper.querySelector('.scroll-content');
+            const customScrollbar = wrapper.querySelector('.custom-scrollbar');
+            const track = wrapper.querySelector('.scrollbar-track');
+            const thumb = wrapper.querySelector('.scrollbar-thumb');
+            const arrowUp = wrapper.querySelector('.scrollbar-arrow-up');
+            const arrowDown = wrapper.querySelector('.scrollbar-arrow-down');
+
+            const HOVER_IN_DELAY = 200, HOVER_OUT_DELAY = 500, ARROW_STEP = 80, ARROW_HOLD_INTERVAL = 140;
+            let hoverInTimer = null, hoverOutTimer = null, isExpanded = false, dragging = false, dragStartY = 0, scrollStart = 0, arrowInterval = null;
+
+            function updateThumb() {
+                const scrollHeight = content.scrollHeight, clientHeight = content.clientHeight;
+                if (scrollHeight <= clientHeight) { thumb.style.display = 'none'; return; } else { thumb.style.display = 'block'; }
+                const trackHeight = track.getBoundingClientRect().height;
+                const thumbHeight = Math.max((clientHeight / scrollHeight) * trackHeight, 40);
+                const maxTop = trackHeight - thumbHeight;
+                const top = (content.scrollTop / (scrollHeight - clientHeight)) * maxTop;
+                thumb.style.height = thumbHeight + 'px';
+                thumb.style.top = top + 'px';
+            }
+            updateThumb();
+            content.addEventListener('scroll', updateThumb);
+            window.addEventListener('resize', updateThumb);
+
+            customScrollbar.addEventListener('pointerenter', () => {
+                clearTimeout(hoverOutTimer); hoverInTimer = setTimeout(() => {
+                    customScrollbar.classList.add('expanded'); isExpanded = true; thumb.style.borderRadius = '0'; updateThumb();
+                }, HOVER_IN_DELAY);
+            });
+
+            customScrollbar.addEventListener('pointerleave', () => {
+                clearTimeout(hoverInTimer); hoverOutTimer = setTimeout(() => {
+                    customScrollbar.classList.remove('expanded'); isExpanded = false;
+                }, HOVER_OUT_DELAY);
+            });
+
+            customScrollbar.addEventListener('wheel', (e) => { e.preventDefault(); content.scrollTop += e.deltaY; }, { passive: false });
+
+            thumb.addEventListener('pointerdown', (e) => { dragging = true; dragStartY = e.clientY; scrollStart = content.scrollTop; thumb.classList.add('dragging'); try { thumb.setPointerCapture(e.pointerId); } catch { } document.body.style.userSelect = 'none'; });
+            document.addEventListener('pointermove', (e) => {
+                if (!dragging) return; const deltaY = e.clientY - dragStartY;
+                const scrollHeight = content.scrollHeight, clientHeight = content.clientHeight, trackHeight = track.clientHeight;
+                const thumbHeight = parseFloat(getComputedStyle(thumb).height) || 40; const maxThumbTop = Math.max(trackHeight - thumbHeight, 1);
+                const ratio = (scrollHeight - clientHeight) / maxThumbTop;
+                content.scrollTop = scrollStart + deltaY * ratio;
+            });
+            document.addEventListener('pointerup', (e) => { if (!dragging) return; dragging = false; thumb.classList.remove('dragging'); try { thumb.releasePointerCapture && thumb.releasePointerCapture(e.pointerId); } catch { } document.body.style.userSelect = ''; });
+
+            thumb.addEventListener('keydown', (e) => {
+                const key = e.key;
+                if (key === 'PageDown') { e.preventDefault(); content.scrollBy({ top: content.clientHeight, behavior: 'smooth' }); }
+                else if (key === 'PageUp') { e.preventDefault(); content.scrollBy({ top: -content.clientHeight, behavior: 'smooth' }); }
+                else if (key === 'Home') { e.preventDefault(); content.scrollTo({ top: 0, behavior: 'smooth' }); }
+                else if (key === 'End') { e.preventDefault(); content.scrollTo({ top: content.scrollHeight, behavior: 'smooth' }); }
+            });
+
+            track.addEventListener('click', (e) => {
+                if (e.target === thumb) return; const rect = track.getBoundingClientRect();
+                const clickY = e.clientY - rect.top; const thumbTop = parseFloat(thumb.style.top || 0); const thumbHeight = parseFloat(getComputedStyle(thumb).height || 40);
+                if (clickY < thumbTop) content.scrollBy({ top: -content.clientHeight, behavior: 'smooth' });
+                else if (clickY > thumbTop + thumbHeight) content.scrollBy({ top: content.clientHeight, behavior: 'smooth' });
+            });
+
+            function startArrowScrolling(direction) {
+                content.scrollBy({ top: direction * ARROW_STEP, behavior: 'smooth' });
+                if (arrowInterval) clearInterval(arrowInterval);
+                arrowInterval = setInterval(() => { content.scrollBy({ top: direction * (ARROW_STEP / 2), behavior: 'auto' }); }, ARROW_HOLD_INTERVAL);
+            }
+            function stopArrowScrolling() { if (arrowInterval) { clearInterval(arrowInterval); arrowInterval = null; } }
+
+            arrowUp.addEventListener('pointerdown', (e) => { e.preventDefault(); startArrowScrolling(-1); });
+            arrowUp.addEventListener('pointerup', stopArrowScrolling); arrowUp.addEventListener('pointerleave', stopArrowScrolling);
+            arrowUp.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); content.scrollBy({ top: -ARROW_STEP, behavior: 'smooth' }); } });
+
+            arrowDown.addEventListener('pointerdown', (e) => { e.preventDefault(); startArrowScrolling(1); });
+            arrowDown.addEventListener('pointerup', stopArrowScrolling); arrowDown.addEventListener('pointerleave', stopArrowScrolling);
+            arrowDown.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); content.scrollBy({ top: ARROW_STEP, behavior: 'smooth' }); } });
+
+            const observer = new MutationObserver(() => updateThumb());
+            observer.observe(customScrollbar, { attributes: true, attributeFilter: ['class'] });
+            const resizeObserver = new ResizeObserver(updateThumb);
+            resizeObserver.observe(content);
+
+            [arrowUp, arrowDown, thumb].forEach(el => {
+                el.addEventListener('focus', () => {
+                    clearTimeout(hoverOutTimer); clearTimeout(hoverInTimer); customScrollbar.classList.add('expanded'); isExpanded = true; updateThumb();
+                }); el.addEventListener('blur', () => { clearTimeout(hoverInTimer); hoverOutTimer = setTimeout(() => { customScrollbar.classList.remove('expanded'); isExpanded = false; }, HOVER_OUT_DELAY); });
+            });
+        })();
+    </script>
+</body>
+
+</html>
