@@ -410,7 +410,7 @@
             font-size: 17px;
             font-weight: 400;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.15s ease;
         }
 
         .letter-btn:hover {
@@ -479,6 +479,7 @@
         </div>
         <div class="scroll-wrapper">
             <div class="scroll-content" tabindex="0" aria-label="Scrollable content">
+
                 <div class="app-view">
                 <div class="app-list-item">
                     <div class="app-list-letter">Most used</div>
@@ -829,17 +830,17 @@
 
                 <div class="letter-btn">B</div>
                 <div class="letter-btn">C</div>
-                <div class="letter-btn disabled">D</div>
-                <div class="letter-btn disabled">E</div>
+                <div class="letter-btn">D</div>
+                <div class="letter-btn">E</div>
 
                 <div class="letter-btn">F</div>
                 <div class="letter-btn">G</div>
-                <div class="letter-btn disabled">H</div>
-                <div class="letter-btn disabled">I</div>
+                <div class="letter-btn">H</div>
+                <div class="letter-btn">I</div>
 
-                <div class="letter-btn disabled">J</div>
-                <div class="letter-btn disabled">K</div>
-                <div class="letter-btn disabled">L</div>
+                <div class="letter-btn">J</div>
+                <div class="letter-btn">K</div>
+                <div class="letter-btn">L</div>
                 <div class="letter-btn">M</div>
 
                 <div class="letter-btn">N</div>
@@ -847,17 +848,17 @@
                 <div class="letter-btn">P</div>
                 <div class="letter-btn">Q</div>
 
-                <div class="letter-btn disabled">R</div>
+                <div class="letter-btn">R</div>
                 <div class="letter-btn">S</div>
                 <div class="letter-btn">T</div>
-                <div class="letter-btn disabled">U</div>
+                <div class="letter-btn">U</div>
 
-                <div class="letter-btn disabled">V</div>
+                <div class="letter-btn">V</div>
                 <div class="letter-btn">W</div>
                 <div class="letter-btn">X</div>
-                <div class="letter-btn disabled">Y</div>
+                <div class="letter-btn">Y</div>
 
-                <div class="letter-btn disabled">Z</div>
+                <div class="letter-btn">Z</div>
                 <div class="letter-btn">🌐</div>
             </div>
                 </div>
@@ -926,7 +927,7 @@
 
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
 
-        // App sorting logic
+        // App sorting logic and dynamic disabling
         document.addEventListener("DOMContentLoaded", () => {
             const allApps = Array.from(document.querySelectorAll('.app-view .app-list-item'))
                 .filter(item => item.querySelector('.app-list-name')); // only actual app entries
@@ -970,6 +971,37 @@
                     el.style.display = 'none';
                 }
             });
+
+            // Dynamic disabling of letter-btns based on visible sections
+            const visibleSections = new Set();
+            document.querySelectorAll('.app-view .app-list-letter').forEach(letterDiv => {
+                const parent = letterDiv.parentNode;
+                if (parent.style.display !== 'none') {
+                    const label = letterDiv.textContent.trim();
+                    visibleSections.add(label);
+                }
+            });
+
+            // Map "Most used" to 🕐
+            visibleSections.add('🕐'); // Always enable 🕐 if Most used exists (it does)
+
+            document.querySelectorAll('.grid-view .letter-btn').forEach(btn => {
+                const btnText = btn.textContent.trim();
+                if (!visibleSections.has(btnText)) {
+                    btn.classList.add('disabled');
+                }
+            });
+
+            // Add data-letter to app-list-letters for easier targeting (except Most used)
+            document.querySelectorAll('.app-view .app-list-letter').forEach(letterDiv => {
+                const label = letterDiv.textContent.trim();
+                if (label !== 'Most used') {
+                    letterDiv.setAttribute('data-letter', label);
+                    letterDiv.closest('.app-list-item').setAttribute('data-section', label);
+                } else {
+                    letterDiv.closest('.app-list-item').setAttribute('data-section', '🕐');
+                }
+            });
         });
 
         // View switching logic
@@ -980,12 +1012,19 @@
         const content = document.querySelector('.scroll-content');
         gridView.style.display = 'none';
 
-        // Add click listeners to letter headers (single char only)
+        // Add click listeners to letter headers (single char only, excluding Most used)
         document.querySelectorAll('.app-view .app-list-item').forEach(item => {
             const letterDiv = item.querySelector('.app-list-letter');
-            if (letterDiv && letterDiv.textContent.trim().length === 1) {
+            const label = letterDiv ? letterDiv.textContent.trim() : '';
+            if (letterDiv && label.length === 1 && label !== '🕐' && !label.includes('Most used')) {
                 item.addEventListener('click', () => {
                     if (currentView === 'app') {
+                        // Highlight the corresponding letter-btn briefly
+                        const targetBtn = document.querySelector(`.letter-btn[data-corresponding="${label}"]`) || Array.from(document.querySelectorAll('.letter-btn')).find(btn => btn.textContent.trim() === label);
+                        if (targetBtn) {
+                            targetBtn.style.background = 'rgba(0, 120, 212, 0.3)';
+                            setTimeout(() => { targetBtn.style.background = ''; }, 500);
+                        }
                         gridView.style.display = 'block';
                         scrollContent.classList.add('show-grid');
                         setTimeout(() => {
@@ -996,6 +1035,34 @@
                         }, 250);
                     }
                 });
+            }
+        });
+
+        // Add click listeners to letter-btns
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('letter-btn') && !e.target.classList.contains('disabled') && currentView === 'grid') {
+                const btnText = e.target.textContent.trim();
+                appView.style.display = 'block';
+                scrollContent.classList.remove('show-grid');
+                setTimeout(() => {
+                    gridView.style.display = 'none';
+                    currentView = 'app';
+
+                    // Navigate to the corresponding section
+                    let targetSection;
+                    if (btnText === '🕐') {
+                        targetSection = document.querySelector('.app-view .app-list-item[data-section="🕐"]');
+                    } else {
+                        targetSection = document.querySelector(`.app-view .app-list-item[data-section="${btnText}"]`);
+                    }
+                    if (targetSection) {
+                        content.scrollTo({
+                            top: targetSection.offsetTop - 16, // Account for padding
+                            behavior: 'smooth'
+                        });
+                        content.dispatchEvent(new Event('scroll'));
+                    }
+                }, 250);
             }
         });
 
